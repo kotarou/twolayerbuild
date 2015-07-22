@@ -15,23 +15,24 @@ class Entity:
     """ 
     
     def __init__(self, identifier="", description="", size=np.array([0.0, 0.0]), pos=np.array([0.0, 0.0]), parent=None, expires=False,
-            isChild=False, deathTime=0, renderable=True, interactable=True):
+        deathTime=0, renderable=True, interactable=True):
         # (Hopefully) unique identifier for this entity
-        self.identifier=""
+        self.identifier     = identifier
         # Generic description of what this entity is for. 
-        self.description=""
+        self.description    = description
         # Axis-aligned dimensions of the entity.
         self.size           = size
-        # Loction of the entity. If the entity is a child, this will be relative to the parent.
+        # Loction of the entity. If the entity is a child, this wll intially be the offest of the child against the parent.
         self.pos            = pos
         # Parent of ths entity.
         self.parent         = parent
         # Will the entity expire after appearing on screen?
         self.expires        = expires
         # Is this a child of another entity?
-        self.isChild        = isChild
         if self.parent == None:
             self.isChild = False
+        else:
+            self.isChild=True
         # Time at which this entity was created.
         self.creationTime   = current_milli_time()
         # Time at which this entity should expire.
@@ -53,7 +54,7 @@ class Entity:
     def update(self, dt): pass
 
     def toString(self):
-        return identifier
+        return self.identifier
 
     def addChild(self, child):
         self.children.append(child)
@@ -72,11 +73,11 @@ class Popup(Entity):
     """
 
     def __init__(self, text, identifier="", description="", ox=0.0, oy=0.0, parent=None, expires=True,
-            isChild=False, deathtime=3000, renderable=True, interactable=False, fsize=10):
+            deathtime=3000, renderable=True, interactable=False, fsize=10):
         size    = np.array([0.0, 0.0])
         pos     = np.array([ox+parent.pos[0], oy+parent.pos[1]])
         
-        Entity.__init__(self, identifier, description, size, pos, parent, expires, isChild, deathtime, renderable, interactable)
+        Entity.__init__(self, identifier, description, size, pos, parent, expires, deathtime, renderable, interactable)
         
         # Fontsize of tjhe popup's message
         self.fsize  = fsize
@@ -86,11 +87,13 @@ class Popup(Entity):
         label = pyglet.text.Label(self.text,
                     font_name='Times New Roman',
                     font_size=self.fsize,
-                    color=(255,0,0,255),
+                    color=(255,255,255,255),
                     x=self.pos[0], y=self.pos[1],
                     anchor_x='center', anchor_y='center')
         label.draw()
 
+    def update(self, dt):
+        self.pos = self.pos + self.parent.vel*dt
 
 
         
@@ -104,13 +107,22 @@ class Actor(Entity):
     description = "A moving actor of unknown particulars"
 
     def __init__(self, identifier="", description="", sx=0, sy=0, x=0, y=0, vx=0, vy=0, parent=None, expires=False,
-            isChild=False, deathtime=0, renderable=True, interactable=True):
+            deathtime=0, renderable=True, interactable=True, color=(1.0,1.0,1.0)):
         size    = np.array([sx, sy], dtype = 'float32')
         pos     = np.array([x, y], dtype = 'float32')
-        Entity.__init__(self, identifier, description, size, pos, parent, expires, isChild, deathtime, renderable, interactable)
+        Entity.__init__(self, identifier, description, size, pos, parent, expires, deathtime, renderable, interactable)
         
         # The velocity of the actor
         self.vel = np.array([vx,vy])
+        if self.isChild:
+            self.vel += parent.vel
+
+        # If this is a child, define its location by adding its position(offset) to its parents
+        if self.isChild:
+            self.pos = parent.pos + self.pos
+
+        # The color of the actor
+        self.color = color
 
     # def __init__(self, identifier, x, y, sx, sy, parent=None):
     #     self.identifier = identifier
@@ -129,8 +141,8 @@ class Actor(Entity):
         """
         if not self.interactable:
             return
-        if len(self.children) == 0:
-            self.addChild(Popup(text="hi",ox=10,oy=10,fsize=10,parent=self))
+        #Wif len(self.children) == 2:
+        self.addChild(Popup(text="hi",ox=10,oy=10,fsize=10,parent=self))
     
     def update(self, dt):
         """
@@ -145,32 +157,32 @@ class Actor(Entity):
             if ent.expires and current_milli_time() >  ent.deathTime:
                 deleteChildren.append(ent)
             else:
-                ent.pos += dt*self.vel 
+               ent.update(dt)
         self.children = [e for e in self.children if e not in deleteChildren]
 
-    def setVelocity(self, vx, vy, absolute=False):
-        self.vel[0] = vx
-        self.vel[1] = vy
+    # def setVelocity(self, vx, vy, absolute=False):
+    #     self.vel[0] = vx
+    #     self.vel[1] = vy
 
-        if self.isChild and not absolute:
-            self.vel += self.parent.vel
+    #     if self.isChild and not absolute:
+    #         self.vel += self.parent.vel
 
-    def updatePosition(self, dx, dy):
-        self.pos[0] += dx
-        self.pos[1] += dy
+    # def updatePosition(self, dx, dy):
+    #     self.pos[0] += dx
+    #     self.pos[1] += dy
 
-        if self.isChild and not absolute:
-            self.vel += self.parent.vel
+    #     if self.isChild and not absolute:
+    #         self.vel += self.parent.vel
     
-    def setPosition(self, dx, dy, absolute=False):
-        self.pos[0] += dx
-        self.pos[1] += dy
+    # def setPosition(self, dx, dy, absolute=False):
+    #     self.pos[0] += dx
+    #     self.pos[1] += dy
 
-        if self.isChild and not absolute:
-            self.vel += self.parent.vel
+    #     if self.isChild and not absolute:
+    #         self.vel += self.parent.vel
     
-    def kill(self):
-        self.alive = False
+    # def kill(self):
+    #     self.alive = False
     
 
     def draw(self):
@@ -179,12 +191,13 @@ class Actor(Entity):
         x = int(self.pos[0])
         y = int(self.pos[1])
 
-        if self.isChild:
-            x += int(self.parent.pos[0])
-            y += int(self.parent.pos[1])
+        # if self.isChild:
+        #     x += int(self.parent.pos[0])
+        #     y += int(self.parent.pos[1])
 
         dx = int(self.size[0])
         dy = int(self.size[1])
+        pyglet.gl.glColor3f(self.color[0],self.color[1],self.color[2]); 
         pyglet.graphics.draw_indexed(4, pyglet.gl.GL_TRIANGLES, [0, 1, 2, 0, 2, 3], ('v2i', (x, y, x+dx, y, x+dx, y+dy, x, y+dy))) 
 
         for ent in self.children:
