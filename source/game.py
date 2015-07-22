@@ -6,17 +6,12 @@ GAME_TICKS_PER_SECOND 	= 60.0
 pyglet.resource.path = ['../resources']
 pyglet.resource.reindex()
 
-xx = entity.Actor(identifier="bob",x=100,y=100)
-xx.respond()
-xx.setVelocity(1,1)
-y = entity.Trap("james")
-y.respond()
-
+xx = entity.Actor(identifier="bob",x=100,y=100, sx=50, sy=50, vx=3.0, vy=3.0)
 
 game_window = pyglet.window.Window(800, 600) 
 
 renderables =[xx]
-interface = [y]
+interface = []
 
 @game_window.event
 def on_draw(): 
@@ -59,8 +54,10 @@ def on_mouse_press(x, y, button, modifiers):
 		modifiers	:	(int)	Modifying keys that were pressed in conjunction with the mouse
 	"""
 	print("Mouse clicked")
-	xx.setPosition(x,y)
-	print(xx.renderable)
+	a = findObjectUnderCursor(x, y)
+	if type(a) != type(None):
+		a.respond()
+
 
 @game_window.event
 def on_key_press(symbol, modifiers):
@@ -71,6 +68,19 @@ def on_key_press(symbol, modifiers):
 		modifiers	:	(int) Modifying keys that were pressed
 	"""
 	print(symbol, ' was pressed')
+
+def findObjectUnderCursor(x, y):
+	""" 
+		Find the object under the cursor.
+		Return interface components (menus/etc) before game objects.
+		Not there is currently no z-buffer, so it does not check for which object is ontop yet.
+	"""
+	for ent in interface:
+		if ent.intersect(x, y):
+			return ent
+	for ent in renderables:
+		if ent.intersect(x,y):
+			return ent
 
 def draw_fps():
 	""" 
