@@ -11,6 +11,8 @@ class Tile:
 	identifier = ""
 
 	navigatable = ""
+
+	pos = np.array([0.0, 0.0])
 	
 	def __init__(self, identifier):
 		self.identifier = identifier
@@ -26,15 +28,12 @@ class Floor(Tile):
 	description = ""
 	identifier = ""
 
-	posX = 0
-	posY = 0
-
 	navigatable = True
 
 	def __init__(self, identifier, inX, inY):
 		self.identifier = identifier
-		self.posX = inX
-		self.posY = inY
+		pos[0] = inX
+		pos[1] = inY
 
 class Wall(Tile):
 
@@ -44,15 +43,12 @@ class Wall(Tile):
 	description = ""
 	identifier = ""
 
-	posX = 0
-	posY = 0
-
 	navigatable = False
 
 	def __init__(self, identifier, inX, inY):
 		self.identifier = identifier
-		self.posX = inX
-		self.posY = inY
+		pos[0] = inX
+		pos[1] = inY
 
 class Corridor(Tile):
 
@@ -62,12 +58,9 @@ class Corridor(Tile):
 	description = ""
 	identifier = ""
 
-	posX = 0
-	posY = 0
-
 	navigatable = True
 
 	def __init__(self, identifier, inX, inY):
 		self.identifier = identifier
-		self.posX = inX
-		self.posY = inY
+		pos[0] = inX
+		pos[1] = inY
