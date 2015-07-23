@@ -1,126 +1,157 @@
-import pyglet 
-import entity
+from pyglet import *
+from pyglet.gl import *
+import numpy as np
+
+
+from camera import *
+
+try:
+    import Queue as Q  # ver. < 3.0
+except ImportError:
+    import queue as Q
+
 
 GAME_TICKS_PER_SECOND 	= 60.0 
 
 pyglet.resource.path = ['../resources']
 pyglet.resource.reindex()
 
-xx = entity.Actor(identifier="bob",description="Large quare used to rendering tests",x=100,y=100, sx=50, sy=50, vx=3.0, vy=3.0, color=(1.0,0,0))
-yy = entity.Actor(identifier="james",description="Medium quare used to rendering tests",x=10,y=10, sx=30, sy=30, parent=xx, color=(0,1.0,0))
-zz = entity.Actor(identifier="andrew",description="Small quare used to rendering tests",x=10,y=10, sx=10, sy=10, parent=yy, color=(0,0,1.0))
-yy.addChild(zz)
-xx.addChild(yy)
+class Hud(object):
 
-print(yy.toString())
+    def __init__(self, win):
+        helv = font.load('Helvetica', win.width / 30.0)
+        self.text = font.Text(
+            helv,
+            'Two Layer Game',
+            x=10,
+            y=win.height - 10,
+            halign=font.Text.LEFT,
+            valign=font.Text.TOP,
+            color=(1, 1, 1, 0.5),
+        )
+        self.fps = clock.ClockDisplay()
 
-game_window = pyglet.window.Window(800, 600) 
+    def draw(self):
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        self.text.draw()
+        self.fps.draw()
 
-# Going to need to work out how to add children into this
-renderables =[xx]
-interface = []
+class World(object):
 
-@game_window.event
-def on_draw(): 
-	"""
-		Main game draw method: redraw the game window whenever called.
-	"""
-	# Clear the game window to a black background
-	game_window.clear() 
+    def __init__(self):
+    	print("setup")
+    	# Entities go here
+    	# Can explicitly call functions on a timer
+    	# Only methods called from here need a dt
+    	# Methods called from mainLoop don't
+        #clock.schedule_interval(self.update, 0.25)
 
-	# Render all objects that need rendering
-	for ent in renderables:
-		ent.draw()
-	
-	# Render menus
+    def update(self):
+        x = 2 #temp code
 
-	# Render interface
-	draw_fps()
-
-	# Console debugging
-	# print("Window redrawn")
-	
-	#level_label.draw() 
-	#score_label.draw()
-
-def update(dt): 
-	""" 
-		Game update method. Is called every tick 
-		dt			:	(float)	Time since previous update call
-	"""
-	for ent in renderables: 
-		ent.update(dt)
-  
-
-@game_window.event
-def on_mouse_press(x, y, button, modifiers):
-	"""
-		Event that fires whenever a mouse button is clicked.
-		x, y 		:	(int)	The coordinates of the mouse click location
-		button		:	(int)	The mouse button that was pressed. 1 = left click, 4 = right click
-		modifiers	:	(int)	Modifying keys that were pressed in conjunction with the mouse
-	"""
-	print("Mouse clicked")
-	a = findObjectUnderCursor(x, y)
-	if type(a) != type(None):
-		a.respond()
-		print("you clicked on", a.toString())
+    def draw(self):
+        glClear(GL_COLOR_BUFFER_BIT)
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        # Run over entities and cal their draw methods
+        # For now, temp:
+        glLoadIdentity()
+        glBegin(GL_LINES);
+        glColor3f(0.0, 1.0, 0.0) #// Green for x axis
+        glVertex3f(0,0,0)
+        glVertex3f(100,0,0)
+        glColor3f(1.0,0.0,0.0) #// Red for y axis
+        glVertex3f(0,0,0)
+        glVertex3f(0,100,0)
+        glColor3f(0.0,0.0,1.0) #// Blue for z axis
+        glVertex3f(0,0,0) 
+        glVertex3f(0,0,100)
+        glEnd()
 
 
-@game_window.event
-def on_key_press(symbol, modifiers):
-	"""
-		Event that fires whenever a key is pressed.
-		symbol		:	(int) The key that was pressed. Use key.A / key.LEFT / etc for comparison
-							See pyglet.window.key for a list of keys
-		modifiers	:	(int) Modifying keys that were pressed
-	"""
-	print(symbol, ' was pressed')
 
-def findObjectUnderCursor(x, y):
-	""" 
-		Find the object under the cursor.
-		Return interface components (menus/etc) before game objects.
-		Not there is currently no z-buffer, so it does not check for which object is ontop yet.
-	"""
-	for ent in interface:
-		ob = RfindObjectUndercursor(ent, x, y)
-		if ob != None:
-			return ob
-	for ent in renderables:
-		ob = RfindObjectUndercursor(ent, x, y)
-		if ob != None:
-			return ob
-	return None
+class Game(object):
 
-def RfindObjectUndercursor(ent, x, y):
-	"""
-		Recursive portion of finding objects under cursor
-		Checks through an entities children to check if they intersct as well.
-	"""
-	if len(ent.children) > 0:
-		for child in ent.children:
-			ob = RfindObjectUndercursor(child, x, y)
-			if ob != None:
-				return ob
-	if ent.intersect(x,y):
+    def __init__(self):
+        self.world = World()
+        self.window = window.Window(800,600, vsync=True)#fullscreen=True, vsync=True)
+        self.camera = TopDownCamera(self.window)
+        self.hud = Hud(self.window)
+        clock.set_fps_limit(60)
 
-		return ent
-	else:
-		return None
+    def mainLoop(self):
+        while not self.window.has_exit:
+            self.window.dispatch_events()
+
+            self.world.update()
+
+            self.camera.worldProjection()
+            self.world.draw()
+
+            self.camera.hudProjection()
+            self.hud.draw()
+
+            clock.tick()
+            self.window.flip()
+
+game = Game()
+game.mainLoop()
 
 
-def draw_fps():
-	""" 
-		Draw the fps counter in the bottom right of the screen.
-	"""
-		
-	label = pyglet.text.Label("fps: %4.2f" % pyglet.clock.get_fps(),
-						font_name='Times New Roman',
-						font_size=24,
-						x=game_window.width-100, y=70,
-						anchor_x='center', anchor_y='center')
-	label.draw()
+# @game_window.event
+# def on_mouse_press(x, y, button, modifiers):
+# 	"""
+# 		Event that fires whenever a mouse button is clicked.
+# 		x, y 		:	(int)	The coordinates of the mouse click location
+# 		button		:	(int)	The mouse button that was pressed. 1 = left click, 4 = right click
+# 		modifiers	:	(int)	Modifying keys that were pressed in conjunction with the mouse
+# 	"""
+# 	print("Mouse clicked")
+# 	a = findObjectUnderCursor(x, y)
+# 	if type(a) != type(None):
+# 		a.respond()
+# 		print("you clicked on", a.toString())
 
-pyglet.clock.schedule_interval(update, 1/GAME_TICKS_PER_SECOND) 
-pyglet.app.run()
+
+# @game_window.event
+# def on_key_press(symbol, modifiers):
+# 	"""
+# 		Event that fires whenever a key is pressed.
+# 		symbol		:	(int) The key that was pressed. Use key.A / key.LEFT / etc for comparison
+# 							See pyglet.window.key for a list of keys
+# 		modifiers	:	(int) Modifying keys that were pressed
+# 	"""
+# 	print(symbol, ' was pressed')
+
+# def findObjectUnderCursor(x, y):
+# 	""" 
+# 		Find the object under the cursor.
+# 		Return interface components (menus/etc) before game objects.
+# 		Not there is currently no z-buffer, so it does not check for which object is ontop yet.
+# 	"""
+# 	for ent in interface:
+# 		ob = RfindObjectUndercursor(ent, x, y)
+# 		if ob != None:
+# 			return ob
+# 	for ent in renderables:
+# 		ob = RfindObjectUndercursor(ent, x, y)
+# 		if ob != None:
+# 			return ob
+# 	return None
+
+# def RfindObjectUndercursor(ent, x, y):
+# 	"""
+# 		Recursive portion of finding objects under cursor
+# 		Checks through an entities children to check if they intersct as well.
+# 	"""
+# 	if len(ent.children) > 0:
+# 		for child in ent.children:
+# 			ob = RfindObjectUndercursor(child, x, y)
+# 			if ob != None:
+# 				return ob
+# 	if ent.intersect(x,y):
+
+# 		return ent
+# 	else:
+# 		return None
