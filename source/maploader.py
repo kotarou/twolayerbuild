@@ -21,9 +21,14 @@ class MapLoader:
     f.close()
 
     # First line is dimensions of map
-    self.dimensions = lines[0].split()
+    slines = lines[0].split()
+    # ugly as sin, but lets make them ints
+    self.dimensions = []
+    self.dimensions.append(int(slines[0]))
+    self.dimensions.append(int(slines[1]))
 
     self.mapchr = []
+
     i = 1
     ismap = True
 
