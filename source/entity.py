@@ -11,11 +11,29 @@ current_milli_time = lambda: int(round(time.time() * 1000))
 
 class Entity: 
     """
-        The base class for any object inside the game.
+        The base class for any non-menu element inside the game.
+
+        Required parameters
+        identifier (string) :   A unique handle for identifying am entity. Will be used to index the entity in the game world.
+
+        Optional parameters
+        description (string):   A string that describes the entity. Will be revealed when the entities toString() method is called.
+                                Must be defined if the object is interactable
+        size (1x2 np array) :   The dimensions (x,y) of the axis-aligned bounding box of the entity.
+        pos (1x2 np array)  :   The position of the top left corner of this entities axis-aligned bounding box in screen space.
+        parent (reference)  :   The parent of this entities. If this is defined, the entity will inherit transformations from the parent.
+        expires (bool)      :   Whether the entity will expire and be deleted.
+        deathtime (float)   :   The time in milliseconds that the entity will expire at.
+        renderable (bool)   :   Whether the entity will be rendered or not.
+        interactable (bool) :   Whether the entity will respond to player interaction or not. 
     """ 
     
-    def __init__(self, identifier="", description="", size=np.array([0.0, 0.0]), pos=np.array([0.0, 0.0]), parent=None, expires=False,
-        deathTime=0, renderable=True, interactable=True):
+    def __init__(self, 
+            identifier, description="", 
+            size=np.array([0.0, 0.0]), pos=np.array([0.0, 0.0]), 
+            parent=None, 
+            expires=False, deathTime=0, 
+            renderable=True, interactable=True):
         # (Hopefully) unique identifier for this entity
         self.identifier     = identifier
         # Generic description of what this entity is for. 
@@ -41,6 +59,9 @@ class Entity:
         self.renderable     = renderable
         # Is this entity interactable? At this time, this implies it csan be clicked on.
         self.interactable   = interactable
+        if self.interactable and len(self.description) == "":
+            print("An entity must have a description if it can be interacted with")
+            raise Exception(self.identifier, "Interactable object with no description")
         # An object cannot be created with children. These are added using addChild
         self.children       = []
 
@@ -54,7 +75,7 @@ class Entity:
     def update(self, dt): pass
 
     def toString(self):
-        return self.identifier
+        return ("Entity:", self.identifier, "with description:", self.description)
 
     def addChild(self, child):
         self.children.append(child)
@@ -70,16 +91,18 @@ class Entity:
 class Popup(Entity):
     """
         Temp child class for testing
+        It does not make sense for a popup to need a description to be added.
+
     """
 
-    def __init__(self, text, identifier="", description="", ox=0.0, oy=0.0, parent=None, expires=True,
+    def __init__(self, text, identifier, description="", ox=0.0, oy=0.0, parent=None, expires=True,
             deathtime=3000, renderable=True, interactable=False, fsize=10):
         size    = np.array([0.0, 0.0])
         pos     = np.array([ox+parent.pos[0], oy+parent.pos[1]])
         
         Entity.__init__(self, identifier, description, size, pos, parent, expires, deathtime, renderable, interactable)
         
-        # Fontsize of tjhe popup's message
+        # Fontsize of the popup's message
         self.fsize  = fsize
         self.text   = text
         
@@ -94,23 +117,31 @@ class Popup(Entity):
 
     def update(self, dt):
         self.pos = self.pos + self.parent.vel*dt
-
-
-        
+     
 class Actor(Entity):
     """
-        Base class for any moving actor within the game.
-        The assumption is that any moving actor can die.
+        Base class for any interactive actor within the game.
+        
+        Required parameters:
+        description (string):   Unlike the base Entity, an actor is always going to be interactive, and thus always needs a descrption.
+                                The interactable arguement allows a actor to be loaded before it can be interacted with.
+
+        Optional parameters:
+        color (f, f, f)     :   A color arguement to control the color of the basic square representing the actor.
+                                Will be removed once sprite loading is possible.
+        sx, sy (float)      :   The size (horixontal, vertical) of the actor 
+        x, y (float)        :   The position of the actor in screen space, relative to its parent (if any)
+        vx, vy (float)      :   The velocity of the actor in screen space, relative to its parent (if any)
     """
     #sprite = "" 
     alive = True
     description = "A moving actor of unknown particulars"
 
-    def __init__(self, identifier="", description="", sx=0, sy=0, x=0, y=0, vx=0, vy=0, parent=None, expires=False,
-            deathtime=0, renderable=True, interactable=True, color=(1.0,1.0,1.0)):
+    def __init__(self, identifier, description, sx=0, sy=0, x=0, y=0, vx=0, vy=0, parent=None, expires=False,
+            deathTime=0, renderable=True, interactable=True, color=(1.0,1.0,1.0)):
         size    = np.array([sx, sy], dtype = 'float32')
         pos     = np.array([x, y], dtype = 'float32')
-        Entity.__init__(self, identifier, description, size, pos, parent, expires, deathtime, renderable, interactable)
+        Entity.__init__(self, identifier, description, size, pos, parent, expires, deathTime, renderable, interactable)
         
         # The velocity of the actor
         self.vel = np.array([vx,vy])
@@ -142,7 +173,7 @@ class Actor(Entity):
         if not self.interactable:
             return
         #Wif len(self.children) == 2:
-        self.addChild(Popup(text="hi",ox=10,oy=10,fsize=10,parent=self))
+        self.addChild(Popup(identifier="popup",text="hi",ox=10,oy=10,fsize=10,parent=self,interactable=False))
     
     def update(self, dt):
         """

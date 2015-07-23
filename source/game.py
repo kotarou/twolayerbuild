@@ -6,9 +6,9 @@ GAME_TICKS_PER_SECOND 	= 60.0
 pyglet.resource.path = ['../resources']
 pyglet.resource.reindex()
 
-xx = entity.Actor(identifier="bob",x=100,y=100, sx=50, sy=50, vx=3.0, vy=3.0, color=(1.0,0,0))
-yy = entity.Actor(identifier="james",x=10,y=10, sx=30, sy=30, parent=xx, color=(0,1.0,0))
-zz = entity.Actor(identifier="andrew",x=10,y=10, sx=10, sy=10, parent=yy, color=(0,0,1.0))
+xx = entity.Actor(identifier="bob",description="Large quare used to rendering tests",x=100,y=100, sx=50, sy=50, vx=3.0, vy=3.0, color=(1.0,0,0))
+yy = entity.Actor(identifier="james",description="Medium quare used to rendering tests",x=10,y=10, sx=30, sy=30, parent=xx, color=(0,1.0,0))
+zz = entity.Actor(identifier="andrew",description="Small quare used to rendering tests",x=10,y=10, sx=10, sy=10, parent=yy, color=(0,0,1.0))
 yy.addChild(zz)
 xx.addChild(yy)
 
