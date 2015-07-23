@@ -1,13 +1,11 @@
-import pyglet
+import pyglet, tile
 
 class Room:
 
 	tileList = ""
+	tileDict = {'floor': tile.Floor, 'wall': tile.Wall, 'corridor': tile.Corridor}
 
-	def __init__(self, sizeX, sizeY, inX, inY):
-		for i in range(inX, (inX+sizeX)):
-			for j in range(inY, (inY+sizeY)):
-				if i==inX or i==(inX+sizeX) or j==inY or j==(inY+sizeY):	
-					self.tileList += Wall.init("identifier", i, j)
-				else:
-					self.tileList += Floor.init("identifier", i, j)
+	def __init__(self, roomType, xStart, yStart, xEnd, yEnd):
+		for i in range(xStart, xEnd):
+			for j in range(yStart, yEnd):
+				tileList += tileDict[roomType].init(i,j)
