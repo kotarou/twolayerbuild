@@ -6,13 +6,16 @@ class Room:
 	roomDict = {}
 
 	#defines the rooms used in the current map
-	#takes a single room input and adds it to the tileDict - which is referenced in the creation of rooms
-	#TODO: create the ability for the base characteristics of the tiles to be defined here
-	#TODO: create the ability for tile-scripts to be inputted here
+	#takes a keyIn array which declares the reference for the tile type at i
+	#takes a tileTypeIn 2d array which has:
+	#	[n][], where n is the tile reference at i - this should always be in line with key. 
+	#	[this could be potentially used to derive a key value, if we don't care that key values are from 0 to numTileTypes rather than explicit predefined values]
+	#	AND
+	#	[][n], where 0-n define the tile's properties.
 
-	def __init__(self, keyIn, roomTypeIn):
+	def __init__(self, keyIn, tileTypeIn):
 		for i in range(0,keyIn.len()):
-			tileDict[keyIn[i]] = o[roomTypeList[i]]
+			tileDict[keyIn[i]] = Tile.type(str(tileTypeIn[i][0]), (), {'navigatable': tileTypeIn[i][1]})
 
 	#creates each of the rooms
 	#adds the room to the roomDict
