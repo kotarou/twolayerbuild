@@ -50,10 +50,21 @@ class MapLoader:
         self.rooms[room] = []
       else:
         rm = line.strip().split()
-        self.rooms[room].append(rm)
+        #print(rm)
+        rm2 = []
+        pair = []
+        for item in rm:
+          rm2 = self.to_int_pair(item)
+          pair.append(rm2)
+        self.rooms[room].append(pair)
+
 
     return (self.dimensions, self.mapchr, self.rooms)
 
+  # converts a pair of numbers with a comma to a twotupple of int
+  def to_int_pair(self, pair):
+      proc = pair.split(',')
+      return (int(proc[0]),int(proc[1]))
 
 if __name__ == "__main__":
   mapname = 'resources/map.dat'
