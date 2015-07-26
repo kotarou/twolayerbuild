@@ -12,13 +12,20 @@ class Tile:
 
 	navigatable = ""
 
-	pos = np.array([0.0, 0.0])
+	pos = ([0.0, 0.0])
 	
 	def __init__(self, identifier):
 		self.identifier = identifier
 
 	@abstractmethod
 	def draw(self): pass
+
+	# TODO: is called when an entity moves onto this tile?
+	@abstractmethod
+	def trigger(self): pass
+
+	# TODO: dynamic implementation from the abstract tile class
+	# TODO: get rid of this hard coded shit
 
 class Floor(Tile):
 
