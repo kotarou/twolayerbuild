@@ -7,12 +7,12 @@ class Room:
 
 	#defines the rooms used in the current map
 	#takes a single room input and adds it to the tileDict - which is referenced in the creation of rooms
-	#?: Is it better to take keyIn and roomTypeIn as arrays and iterate through or take a single tile type as input per init?
 	#TODO: create the ability for the base characteristics of the tiles to be defined here
 	#TODO: create the ability for tile-scripts to be inputted here
 
 	def __init__(self, keyIn, roomTypeIn):
-		tileDict[keyIn = o[roomTypeList]
+		for i in range(0,keyIn.len()):
+			tileDict[keyIn[i]] = o[roomTypeList[i]]
 
 	#creates each of the rooms
 	#adds the room to the roomDict
