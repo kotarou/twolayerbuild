@@ -4,6 +4,7 @@
 """
 from pyglet import *
 from pyglet.gl import *
+from fbo import *
 
 import numpy as np
 
@@ -17,6 +18,9 @@ except ImportError:
 
 
 GAME_TICKS_PER_SECOND 	= 60.0 
+PICK_TOLERANCE 			= 3
+PICK_BUFFER_SIZE 		= 256
+#rendermode				= GL_RENDER	# or GL_SELECT
 
 pyglet.resource.path = ['../resources']
 pyglet.resource.reindex()
@@ -46,7 +50,16 @@ class World(object):
 
 	def __init__(self):
 		print("setup")
-		self.entities = []
+		# Set up a framebuffer object
+		self.fbo = FBO(800, 600)
+
+
+		a = (127, 0, 0)
+		b = (0, 255, 0)
+		c = (0, 0, 255)
+		self.entities = [tempClass(c,c), tempClass2(b,b), tempClass3(a, a)]
+
+		self.entityReferences = []
 		# Entities go here
 		# Can explicitly call functions on a timer
 		# Only methods called from here need a dt
@@ -58,37 +71,46 @@ class World(object):
 			ent.update()
 
 	def draw(self):
-		glClear(GL_COLOR_BUFFER_BIT)
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+		#glMatrixMode(GL_MODELVIEW);
+		# Run over entities and cal their draw methods
+		# For now, temp:
+		# glLoadIdentity()
+		# glBegin(GL_LINES)
+		# glColor3f(0.0, 1.0, 0.0) #// Green for x axis
+		# glVertex3f(0,0,0)
+		# glVertex3f(100,0,0)
+		# glColor3f(1.0,0.0,0.0) #// Red for y axis
+		# glVertex3f(0,0,0)
+		# glVertex3f(0,100,0)
+		# glColor3f(0.0,0.0,1.0) #// Blue for z axis
+		# glVertex3f(0,0,0) 
+		# glVertex3f(0,0,100)
+		# glEnd()
+
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+		glLoadIdentity()
+		glBegin(GL_QUADS)
+		for ent in self.entities:
+			ent.draw()
+		glEnd()
+		# ##################################
+		self.fbo.attach()
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+		glMatrixMode(GL_MODELVIEW);
 		# Run over entities and cal their draw methods
 		# For now, temp:
 		glLoadIdentity()
-		glBegin(GL_LINES)
-		glColor3f(0.0, 1.0, 0.0) #// Green for x axis
-		glVertex3f(0,0,0)
-		glVertex3f(100,0,0)
-		glColor3f(1.0,0.0,0.0) #// Red for y axis
-		glVertex3f(0,0,0)
-		glVertex3f(0,100,0)
-		glColor3f(0.0,0.0,1.0) #// Blue for z axis
-		glVertex3f(0,0,0) 
-		glVertex3f(0,0,100)
-		glEnd()
-
-
 		glBegin(GL_QUADS)
 		#glTranslatef(50,0,0)
-		glColor3f(1.0, 0.0, 0.0)
-		glVertex3f(-10	, -10	, 0)
-		glVertex3f(-10	, 10	, 0)
-		glVertex3f(10	, 10	, 0)
-		glVertex3f(10	, -10	, 0.0)
-		glEnd()
-
-
 		for ent in self.entities:
-			ent.draw()
+			ent.fboDraw()
+		glEnd()
+		self.fbo.detach()
+		# ##################################
+
 
 
 
@@ -103,6 +125,7 @@ class Game(object):
 
 	def mainLoop(self):
 		while not self.window.has_exit:
+			#print("start")
 			self.window.dispatch_events()
 
 			self.world.update()
@@ -115,6 +138,7 @@ class Game(object):
 
 			clock.tick()
 			self.window.flip()
+			#print("end")
 game = Game()
 
 
@@ -131,63 +155,23 @@ def on_mouse_press(x, y, button, modifiers):
 		modifiers	:	(int)	Modifying keys that were pressed in conjunction with the mouse
 	"""
 	print("Mouse clicked")
-	a = glFindObjectUnderCursor(x, y)
-	if type(a) != type(None):
-		print("You clicked on ", a.handle)
-		#a.respond()
-		#print("you clicked on", a.toString())
+	# tex = game.world.fbo.getData()
+	# for i in len(tex):
+	# 	print(tex[i], tex[i+1], tex[i+2], tex[i+3])
+	# 	i += 4
+	#print(tex[4*(800*y+x)],tex[4*(800*y+x)+1],tex[4*(800*y+x)+2],tex[4*(800*y+x)+3])
 
-
-
-
-# def findObjectUnderCursor(x, y):
-# 	""" 
-# 		Find the object under the cursor.
-# 		Return interface components (menus/etc) before game objects.
-# 		Not there is currently no z-buffer, so it does not check for which object is ontop yet.
-# 	"""
-# 	for ent in interface:
-# 		ob = RfindObjectUndercursor(ent, x, y)
-# 		if ob != None:
-# 			return ob
-# 	for ent in renderables:
-# 		ob = RfindObjectUndercursor(ent, x, y)
-# 		if ob != None:
-# 			return ob
-# 	return None
-
-
-# def RfindObjectUndercursor(ent, x, y):
-# 	"""
-# 		Recursive portion of finding objects under cursor
-# 		Checks through an entities children to check if they intersct as well.
-# 	"""
-# 	if len(ent.children) > 0:
-# 		for child in ent.children:
-# 			ob = RfindObjectUndercursor(child, x, y)
-# 			if ob != None:
-# 				return ob
-# 	if ent.intersect(x,y):
-
-# 		return ent
-# 	else:
-# 		return None
-
+	game.world.fbo.attach()
+	pixel = [0] * 3
+	aa = (GLubyte  * 3)(0)
+	pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
+	for ent in game.world.entities:
+		if ent.colorCompare(aa):
+		 	ent.onClick(0,0)
+	game.world.fbo.detach()
+	print("press_ended")
 
 
 game.mainLoop()
 
-
-
-
-
-# @game_window.event
-# def on_key_press(symbol, modifiers):
-# 	"""
-# 		Event that fires whenever a key is pressed.
-# 		symbol		:	(int) The key that was pressed. Use key.A / key.LEFT / etc for comparison
-# 							See pyglet.window.key for a list of keys
-# 		modifiers	:	(int) Modifying keys that were pressed
-# 	"""
-# 	print(symbol, ' was pressed')
 

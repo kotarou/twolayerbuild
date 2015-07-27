@@ -10,35 +10,124 @@ import time
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
-class Element:
+
+    # def __cmp__(self, other):
+    #     # This defines the order of objects in the depth buffer
+    #     return cmp(self.depth, other.depth)
+
+class Element(object):
+    """ 
+        An object
     """
-        This class defines any object that can be rendered.
-        Multiple constructors are offered, depending on the nature of the renderable
-    """
-    def __init__(self, handle, description="", tl=np.array([0,0]), br=np.array([0,0]), color=(1.0, 1.0, 1.0, 1.0), depth=-255):
-        self.renderMode = 0 # rectangles. Temporary rendering
+
+    def __init__(self, handle):
+        """
+        glColor3f handle
+        """
+        # An object should have a unique handle
         self.handle = handle
-        self.descrption = description
-
-        self.tl = tl
-        self.br = br
-        self.color = color
-
-        self.depth = depth
 
     def draw(self):
-        if self.renderMode == 0:
-            # The object is a temp rectangle
-            glColor4f(self.color[0], self.color[1], self.color[2], self.color[3])
-            pg.draw_indexed(4, pyglet.gl.GL_TRIANGLES, [0, 1, 2, 0, 2, 3], ('v2i', 
-                (self.tl[0], self.tl[1], self.br[0], self.tl[1], self.br[0], self.br[1], self.tl[0], self.br[1])))
-
-    def update(self, dt):
+        pass
+    
+    def fobDraw(self):
         pass
 
-    def __cmp__(self, other):
-        # This defines the order of objects in the depth buffer
-        return cmp(self.depth, other.depth)
+    def update(self):
+        pass
+
+    def colorCompare(self, other):
+        return self.handle[0] == other[0] and self.handle[1] == other[1] and self.handle[2] == other[2] 
+
+class MouseInteractable(Element):
+
+    hoverTime = 0.5
+
+    def onClick(self, x, y):
+        pass
+
+    def onHover(self):
+        pass
+
+class KeyInteractable(Element):
+
+    def onKey(key, modifier):
+        pass
+
+class tempClass(MouseInteractable):
+    def __init__(self, handle, color):
+        self.handle = handle
+        self.color  = color
+
+    def onClick(self, x, y):
+        print("Temp class!")
+
+    def draw(self):
+        glColor3ub(self.color[0], self.color[1], self.color[2])
+        glVertex3f(-50  , -50   , 10)
+        glVertex3f(-50  , 50    , 10)
+        glVertex3f(50   , 50    , 10)
+        glVertex3f(50   , -50   , 10.0)
+
+    def fboDraw(self):
+        glColor3ub(self.handle[0], self.handle[1], self.handle[2])
+        glVertex3f(-50  , -50   , 10)
+        glVertex3f(-50  , 50    , 10)
+        glVertex3f(50   , 50    , 10)
+        glVertex3f(50   , -50   , 10.0)
+
+    def update(self):
+        x = 3
+
+class tempClass2(MouseInteractable):
+    def __init__(self, handle, color):
+        self.handle = handle
+        self.color  = color
+
+    def onClick(self, x, y):
+        print("Temp class2!")
+
+    def draw(self):
+        glColor3ub(self.color[0], self.color[1], self.color[2])
+        glVertex3f(-30  , -30   , 0)
+        glVertex3f(-30  , 30    , 0)
+        glVertex3f(30   , 30    , 0)
+        glVertex3f(30   , -30   , 0.0)
+
+    def fboDraw(self):
+        glColor3ub(self.handle[0], self.handle[1], self.handle[2])
+        glVertex3f(-30  , -30   , 0)
+        glVertex3f(-30  , 30    , 0)
+        glVertex3f(30   , 30    , 0)
+        glVertex3f(30   , -30   , 0.0)
+
+    def update(self):
+        x = 3
+
+class tempClass3(MouseInteractable):
+    def __init__(self, handle, color):
+        self.handle = handle
+        self.color  = color
+
+    def onClick(self, x, y):
+        print("Temp class3!")
+
+    def draw(self):
+        glColor3ub(self.color[0], self.color[1], self.color[2])
+        glVertex3f(-10  , -10   , -10)
+        glVertex3f(-10  , 10    , -10)
+        glVertex3f(10   , 10    , -10)
+        glVertex3f(10   , -10   , -10.0)
+
+    def fboDraw(self):
+        glColor3ub(self.handle[0], self.handle[1], self.handle[2])
+        glVertex3f(-10  , -10   , -10)
+        glVertex3f(-10  , 10    , -10)
+        glVertex3f(10   , 10    , -10)
+        glVertex3f(10   , -10   , -10.0)
+
+    def update(self):
+        x = 3
 
 # class Entity: 
 #     """
