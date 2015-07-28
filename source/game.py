@@ -18,11 +18,26 @@ except ImportError:
 
 
 from color import *
+from util import *
 
 GAME_TICKS_PER_SECOND 	= 60.0 
 PICK_TOLERANCE 			= 3
 PICK_BUFFER_SIZE 		= 256
-#rendermode				= GL_RENDER	# or GL_SELECT
+# VERTEX_SHADER = shaders.compileShader(
+# 	"""
+# 	#version 120 
+# 	void main() { 
+# 		gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; 
+# 	}
+# 	""", GL_VERTEX_SHADER)
+
+# FRAGMENT_SHADER = shaders.compileShader(
+# 	"""
+# 	#version 120 
+# 	void main() { 
+# 		gl_FragColor = vec4( 0, 1, 0, 1 ); 
+# 	}
+# 	""", GL_FRAGMENT_SHADER)
 
 pyglet.resource.path = ['../resources']
 pyglet.resource.reindex()
@@ -55,9 +70,10 @@ class World(object):
 		# Set up a framebuffer object
 		self.fbo = FBO(800, 600)
 		# Note that higher Z = closer to camera 
-		self.entities = [tempClass(Color.next(),Color.Blue,[[-70, -70, 1],  [-70, +70, 1],   [+70, -70, 1]],[[0,1,2]]),
-						 tempClass(Color.next(),Color.Red,[[-30, -30, 10],  [-30, +30, 10],   [+30, -30, 10]],[[0,1,2]]), 
-						 tempClass(Color.next(),Color.Green,[[-70, -70, 100],  [-70, +70, 100],   [+70, 70, 100]],[[0,1,2]])]
+		self.entities = [tempClass(Color.next(),Square((100,100,100), 10, Color.Blue)),
+						 tempClass(Color.next(),Triangle((100,150,100), 20, Color.Red)), 
+						 tempClass(Color.next(),Color.Green,[[-70, -70, 100],  [-70, +70, 100],   [+70, 70, 100]],[[0,1,2]]),
+						 tempClass(Color.next(),Color.Yellow,[[-20, -20, 150],  [-20, +20, 150],   [+20, 20, 150], [20, -20, 150]],[[0,1,2], [2,3,0]])]
 		self.entityReferences = []
 		# Entities go here
 		# Can explicitly call functions on a timer

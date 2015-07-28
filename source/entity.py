@@ -11,11 +11,6 @@ import ctypes
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
-
-    # def __cmp__(self, other):
-    #     # This defines the order of objects in the depth buffer
-    #     return cmp(self.depth, other.depth)
-
 class Element(object):
     """ 
         An object
@@ -71,11 +66,18 @@ class VertexRendered(Element):
         self.drawInterior(self.handle)
 
 class tempClass(MouseInteractable, VertexRendered):
-    def __init__(self, handle, color, verticies, indicies):
-        self.handle     = handle
-        self.color      = color
-        self.verticies  = verticies
-        self.indicies   = indicies
+    #def __init__(self, handle, color, verticies, indicies):
+    def __init__(self, *args, **kwargs):
+        if len(args) == 4:
+            self.handle     = args[0]
+            self.color      = args[1]
+            self.verticies  = args[2]
+            self.indicies   = args[3]
+        if len(args) == 2:
+            self.handle     = args[0]
+            self.color      = args[1].color
+            self.verticies  = args[1].vertexList
+            self.indicies   = args[1].indexList
 
     def onClick(self, x, y):
         print("Temp class!")
