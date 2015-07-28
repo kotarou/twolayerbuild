@@ -17,6 +17,8 @@ except ImportError:
 	import queue as Q
 
 
+from color import *
+
 GAME_TICKS_PER_SECOND 	= 60.0 
 PICK_TOLERANCE 			= 3
 PICK_BUFFER_SIZE 		= 256
@@ -52,13 +54,10 @@ class World(object):
 		print("setup")
 		# Set up a framebuffer object
 		self.fbo = FBO(800, 600)
-
-
-		a = (127, 0, 0)
-		b = (0, 255, 0)
-		c = (0, 0, 255)
-		self.entities = [tempClass(c,c), tempClass2(b,b), tempClass3(a, a)]
-
+		# Note that higher Z = closer to camera 
+		self.entities = [tempClass(Color.next(),Color.Blue,[[-70, -70, 1],  [-70, +70, 1],   [+70, -70, 1]],[[0,1,2]]),
+						 tempClass(Color.next(),Color.Red,[[-30, -30, 10],  [-30, +30, 10],   [+30, -30, 10]],[[0,1,2]]), 
+						 tempClass(Color.next(),Color.Green,[[-70, -70, 100],  [-70, +70, 100],   [+70, 70, 100]],[[0,1,2]])]
 		self.entityReferences = []
 		# Entities go here
 		# Can explicitly call functions on a timer
@@ -71,46 +70,21 @@ class World(object):
 			ent.update()
 
 	def draw(self):
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-		#glMatrixMode(GL_MODELVIEW);
-		# Run over entities and cal their draw methods
-		# For now, temp:
-		# glLoadIdentity()
-		# glBegin(GL_LINES)
-		# glColor3f(0.0, 1.0, 0.0) #// Green for x axis
-		# glVertex3f(0,0,0)
-		# glVertex3f(100,0,0)
-		# glColor3f(1.0,0.0,0.0) #// Red for y axis
-		# glVertex3f(0,0,0)
-		# glVertex3f(0,100,0)
-		# glColor3f(0.0,0.0,1.0) #// Blue for z axis
-		# glVertex3f(0,0,0) 
-		# glVertex3f(0,0,100)
-		# glEnd()
-
-
+		# Render the current frame
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity()
-		glBegin(GL_QUADS)
 		for ent in self.entities:
 			ent.draw()
-		glEnd()
-		# ##################################
+		
+		# Render the current picking frame
 		self.fbo.attach()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 		glMatrixMode(GL_MODELVIEW);
-		# Run over entities and cal their draw methods
-		# For now, temp:
 		glLoadIdentity()
-		glBegin(GL_QUADS)
-		#glTranslatef(50,0,0)
 		for ent in self.entities:
 			ent.fboDraw()
-		glEnd()
 		self.fbo.detach()
-		# ##################################
-
 
 
 
@@ -122,6 +96,9 @@ class Game(object):
 		self.camera = TopDownCamera(self.window)
 		self.hud = Hud(self.window)
 		clock.set_fps_limit(60)
+
+		glEnable(GL_DEPTH_TEST)
+
 
 	def mainLoop(self):
 		while not self.window.has_exit:
@@ -155,21 +132,21 @@ def on_mouse_press(x, y, button, modifiers):
 		modifiers	:	(int)	Modifying keys that were pressed in conjunction with the mouse
 	"""
 	print("Mouse clicked")
-	# tex = game.world.fbo.getData()
-	# for i in len(tex):
-	# 	print(tex[i], tex[i+1], tex[i+2], tex[i+3])
-	# 	i += 4
-	#print(tex[4*(800*y+x)],tex[4*(800*y+x)+1],tex[4*(800*y+x)+2],tex[4*(800*y+x)+3])
 
+	# Swap the the frame buffer where picking colors are drawn
 	game.world.fbo.attach()
-	pixel = [0] * 3
+	# Set up storage for the pixel we click on
 	aa = (GLubyte  * 3)(0)
+	# Find the color of the pixel we clicked on
 	pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
+	print(aa[0], aa[1], aa[2])
+	# Find the entity with the corresponding color
 	for ent in game.world.entities:
-		if ent.colorCompare(aa):
+		if ent.handle == Color(aa[0], aa[1], aa[2]):
 		 	ent.onClick(0,0)
+	# Release the picking frame buffer
 	game.world.fbo.detach()
-	print("press_ended")
+
 
 
 game.mainLoop()

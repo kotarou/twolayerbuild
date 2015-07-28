@@ -48,6 +48,16 @@ class Color(namedtuple('__BaseColor', 'r g b')):
 
         return Color(Color.uid_r, Color.uid_g, Color.uid_b)
 
+    def __eq__(self, other):
+        r, g, b = self
+        rr, gg, bb = other
+        return r == rr and b == bb and g == gg
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 Color.Red   = Color(255,0,0)
+Color.Green = Color(0,255,0)
+Color.Blue  = Color(0,0,255)
 Color.White = Color(255,255,255)
 
