@@ -80,7 +80,7 @@ class World(object):
 		# Note that higher Z = closer to camera 
 		self.entities = [tempClass2(Color.next(),Square((100,100,100), 100, Color.White, texture)),
 						 tempClass(Color.next(),Square((100,100,100), 10, Color.Blue)),
-						 tempClass(Color.next(),Triangle((100,150,100), 20, Color.Red)), 
+						 tempClass(Color.next(),Triangle((100,150,100), 20, Color.Red, texture)), 
 						 tempClass(Color.next(),Color.Green,[[-70, -70, 100],  [-70, +70, 100],   [+70, 70, 100]],[[0,1,2]]),
 						 tempClass(Color.next(),Color.Yellow,[[-20, -20, 150],  [-20, +20, 150],   [+20, 20, 150], [20, -20, 150]],[[0,1,2], [2,3,0]])]
 		self.entityReferences = []
