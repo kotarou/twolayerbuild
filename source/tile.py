@@ -4,28 +4,28 @@ import pyglet
 
 class Tile:
 
-	__metacass__ = ABCMeta
+    __metacass__ = ABCMeta
 
-	name = ""
-	description = ""
-	identifier = ""
+    name = ""
+    description = ""
+    identifier = ""
 
-	navigatable = ""
-	draw = ""
-	owner = ""
+    navigatable = ""
+    draw = ""
+    owner = ""
 
-	pos = ([0.0, 0.0])
-	
-	def __init__(self, identifier, owner, inX, inY):
-		self.identifier = identifier
-		self.pos[0] = inX
-		self.pos[1] = inY
-		self.owner = owner
+    pos = ([0.0, 0.0])
+    
+    def __init__(self, identifier, owner, inX, inY):
+        self.identifier = identifier
+        self.pos[0] = inX
+        self.pos[1] = inY
+        self.owner = owner
 
-	@abstractmethod
-	def draw(self): pass
+    @abstractmethod
+    def draw(self): pass
 
-	# TODO: is called when an entity moves onto this tile?
-	#	When some other things calls its trigger?
-	@abstractmethod
-	def trigger(self): pass
+    # TODO: is called when an entity moves onto this tile?
+    #	When some other things calls its trigger?
+    @abstractmethod
+    def trigger(self): pass
