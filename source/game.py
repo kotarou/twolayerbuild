@@ -69,8 +69,17 @@ class World(object):
 		print("setup")
 		# Set up a framebuffer object
 		self.fbo = FBO(800, 600)
+
+		# load the example texture
+		tile_file = pyglet.image.load('resources/floor_tiles.png')
+		subsection = tile_file.get_region(x=128, y=128, width=64, height=64)
+		texture= subsection.get_texture()
+
+
+
 		# Note that higher Z = closer to camera 
-		self.entities = [tempClass(Color.next(),Square((100,100,100), 10, Color.Blue)),
+		self.entities = [tempClass2(Color.next(),Square((100,100,100), 100, Color.White, texture)),
+						 tempClass(Color.next(),Square((100,100,100), 10, Color.Blue)),
 						 tempClass(Color.next(),Triangle((100,150,100), 20, Color.Red)), 
 						 tempClass(Color.next(),Color.Green,[[-70, -70, 100],  [-70, +70, 100],   [+70, 70, 100]],[[0,1,2]]),
 						 tempClass(Color.next(),Color.Yellow,[[-20, -20, 150],  [-20, +20, 150],   [+20, 20, 150], [20, -20, 150]],[[0,1,2], [2,3,0]])]

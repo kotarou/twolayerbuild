@@ -49,6 +49,9 @@ class Color(namedtuple('__BaseColor', 'r g b')):
         return Color(Color.uid_r, Color.uid_g, Color.uid_b)
 
     def __eq__(self, other):
+        # A none color is not possible
+        if other == None:
+            return False
         r, g, b = self
         rr, gg, bb = other
         return r == rr and b == bb and g == gg
