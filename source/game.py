@@ -89,7 +89,24 @@ class World(object):
                     tempClass2(Color.next(),Square((i*20,j*20,100), 20, Color.White, textures[x]))
                 )
 
-
+        self.entities.append(
+                    tempClass2(Color.next(),Square((-100,-100,100), 40, Color(50,100,100)))
+                )
+        self.entities.append(
+                    tempClass2(Color.next(),Square((-140,-100,100), 40, Color(100,100,100)))
+                )
+        self.entities.append(
+                    tempClass2(Color.next(),Square((-180,-100,100), 40, Color(150,100,100)))
+                )
+        self.entities.append(
+                    tempClass2(Color.next(),Square((-100,-140,100), 40, Color(100,100,100).darken()))
+                )
+        self.entities.append(
+                    tempClass2(Color.next(),Square((-140,-140,100), 40, Color(100,100,100)))
+                )
+        self.entities.append(
+                    tempClass2(Color.next(),Square((-180,-140,100), 40, Color(100,100,100).brighten()))
+                )
         # Note that higher Z = closer to camera 
         # self.entities = [tempClass2(Color.next(),Square((100,100,100), 100, Color.White, texture)),
         # 				 tempClass(Color.next(),Square((100,100,100), 10, Color.Blue)),

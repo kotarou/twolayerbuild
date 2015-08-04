@@ -128,9 +128,10 @@ class tempClass2(MouseInteractable, VertexRendered):
             self.indicies   = args[1].indexList
             self.colored    = args[1].colored
             self.textured   = args[1].textured
-
-            self.color      = args[1].color
-            self.texture    = args[1].texture
+            if self.colored:
+                self.color      = args[1].color
+            if self.textured:
+                self.texture    = args[1].texture
             self.textureMap = args[1].textureMap
 
         # Sanity check. Are we textured or colored or both?

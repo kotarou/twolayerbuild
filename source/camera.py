@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+@author: Kotarou
+"""
 from pyglet.gl import *
 
 class Camera(object):
