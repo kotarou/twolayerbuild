@@ -66,7 +66,6 @@ class Hud(object):
 class World(object):
 
     def __init__(self):
-        print("setup")
         # Set up a framebuffer object
         self.fbo = FBO(800, 600)
 
@@ -81,39 +80,67 @@ class World(object):
         sections.append(tile_file.get_region(x=320, y=128, width=64, height=64))
         textures.append(sections[2].get_texture())
 
-        self.entities = []
-        for i in range(10):
-            for j in range(10):
-                x = randint(0, 2)
-                self.entities.append(
-                    tempClass2(Color.next(),Square((i*20,j*20,100), 20, Color.White, textures[x]))
-                )
+        
+        self.entity_manager = EntityManager()
+        self.system_manager = SystemManager(self.entity_manager)
+        #self.system_manager.add_system(TempSystem()) 
 
-        self.entities.append(
-                    tempClass2(Color.next(),Square((-100,-100,100), 40, Color(50,100,100)))
-                )
-        self.entities.append(
-                    tempClass2(Color.next(),Square((-140,-100,100), 40, Color(100,100,100)))
-                )
-        self.entities.append(
-                    tempClass2(Color.next(),Square((-180,-100,100), 40, Color(150,100,100)))
-                )
-        self.entities.append(
-                    tempClass2(Color.next(),Square((-100,-140,100), 40, Color(100,100,100).darken()))
-                )
-        self.entities.append(
-                    tempClass2(Color.next(),Square((-140,-140,100), 40, Color(100,100,100)))
-                )
-        self.entities.append(
-                    tempClass2(Color.next(),Square((-180,-140,100), 40, Color(100,100,100).brighten()))
-                )
+        self.render_manager = SystemManager(self.entity_manager)
+        self.render_manager.add_system(RenderSystem()) 
+        
+
+        self.pick_manager = SystemManager(self.entity_manager)
+        self.pick_manager.add_system(PickSystem())
+
+        self.entities = []
+        # for i in range(10):
+        #     for j in range(10):
+        #         x = randint(0, 2)
+        #         self.entities.append(
+        #             tempClass2(Color.next(),Square((i*20,j*20,100), 20, Color.White, textures[x]))
+        #         )
+
+        # self.entities.append(
+        #             tempClass2(Color.next(),Square((-100,-100,100), 40, Color(50,100,100)))
+        #         )
+        # self.entities.append(
+        #             tempClass2(Color.next(),Square((-140,-100,100), 40, Color(100,100,100)))
+        #         )
+        # self.entities.append(
+        #             tempClass2(Color.next(),Square((-180,-100,100), 40, Color(150,100,100)))
+        #         )
+        # self.entities.append(
+        #             tempClass2(Color.next(),Square((-100,-140,100), 40, Color(100,100,100).darken()))
+        #         )
+        # self.entities.append(
+        #             tempClass2(Color.next(),Square((-140,-140,100), 40, Color(100,100,100)))
+        #         )
+        # self.entities.append(
+        #             tempClass2(Color.next(),Square((-180,-140,100), 40, Color(100,100,100).brighten()))
+        #         )
+
+        x = tempClass3(Color.next(), self.entity_manager)
+        self.entity_manager.add_component(x, MeshComponent(
+        vertexList = [ [100, -100, 0],  
+                            [100, 100, 0],   
+                            [-100, 100, 0]],
+        indexList  = [[0,1,2]],
+        #textureList = [[0,0], [0, 1], [1,1]],
+        #textured=True,
+        #texture=textures[1]
+        colored=True,
+        colorList=Color.Red
+            ))
+        self.entity_manager.add_component(x, MouseClickComponent("Look at me, I'm red!"))
+
+
         # Note that higher Z = closer to camera 
-        # self.entities = [tempClass2(Color.next(),Square((100,100,100), 100, Color.White, texture)),
+        self.entities = [tempClass2(Color.next(),Square((100,100,100), 100, Color.White, textures[1])) ]#,
         # 				 tempClass(Color.next(),Square((100,100,100), 10, Color.Blue)),
         # 				 tempClass(Color.next(),Triangle((100,150,100), 20, Color.Red, texture)), 
         # 				 tempClass(Color.next(),Color.Green,[[-70, -70, 100],  [-70, +70, 100],   [+70, 70, 100]],[[0,1,2]]),
         # 				 tempClass(Color.next(),Color.Yellow,[[-20, -20, 150],  [-20, +20, 150],   [+20, 20, 150], [20, -20, 150]],[[0,1,2], [2,3,0]])]
-        self.entityReferences = []
+
         # Entities go here
         # Can explicitly call functions on a timer
         # Only methods called from here need a dt
@@ -121,24 +148,23 @@ class World(object):
         #clock.schedule_interval(self.update, 0.25)
 
     def update(self):
-        for ent in self.entities:
-            ent.update()
+        self.system_manager.update(0.5)
 
     def draw(self):
         # Render the current frame
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glMatrixMode(GL_MODELVIEW);
+        glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        for ent in self.entities:
-            ent.draw()
+        self.render_manager.update(0.5)
         
-        # Render the current picking frame
+        # # Render the current picking frame
         self.fbo.attach()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity()
-        for ent in self.entities:
-            ent.fboDraw()
+        self.pick_manager.update(0.5)
+        # # for ent in self.entities:
+        # #     ent.fboDraw()
         self.fbo.detach()
 
 
@@ -173,11 +199,6 @@ class Game(object):
             #print("end")
 game = Game()
 
-
-
-def glFindObjectUnderCursor(x, y):
-    pass
-
 @game.window.event
 def on_mouse_press(x, y, button, modifiers):
     """
@@ -195,10 +216,14 @@ def on_mouse_press(x, y, button, modifiers):
     # Find the color of the pixel we clicked on
     pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
     print(aa[0], aa[1], aa[2])
+    
     # Find the entity with the corresponding color
-    for ent in game.world.entities:
-        if ent.handle == Color(aa[0], aa[1], aa[2]):
-            ent.onClick(0,0)
+    # for ent in game.world.entities:
+    #     if ent.handle == Color(aa[0], aa[1], aa[2]):
+    #         ent.onClick(0,0)
+    for e, mesh in game.world.entity_manager.pairs_for_type(MeshComponent):
+        if e.color == Color(aa[0], aa[1], aa[2]):
+            game.world.entity_manager.component_for_entity(e, MouseClickComponent).onClick(x, y)
     # Release the picking frame buffer
     game.world.fbo.detach()
 
