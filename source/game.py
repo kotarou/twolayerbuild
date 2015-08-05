@@ -80,15 +80,15 @@ class World(object):
         sections.append(tile_file.get_region(x=320, y=128, width=64, height=64))
         textures.append(sections[2].get_texture())
 
-        
+        # The entity manager for objects in the game
         self.entity_manager = EntityManager()
         self.system_manager = SystemManager(self.entity_manager)
-        #self.system_manager.add_system(TempSystem()) 
 
+        # The render manager. Updates to redraw graphics
         self.render_manager = SystemManager(self.entity_manager)
         self.render_manager.add_system(RenderSystem()) 
         
-
+        # The pick manager. Updates to a seperate framebuffer than render_manager
         self.pick_manager = SystemManager(self.entity_manager)
         self.pick_manager.add_system(PickSystem())
 
@@ -125,23 +125,20 @@ class World(object):
                             [100, 100, 0],   
                             [-100, 100, 0]],
         indexList  = [[0,1,2]],
-        #textureList = [[0,0], [0, 1], [1,1]],
-        #textured=True,
-        #texture=textures[1]
         colored=True,
         colorList=Color.Red
-            ))
+        ))
         self.entity_manager.add_component(x, MouseClickComponent("Look at me, I'm red!"))
 
+        y = tempClass3(Color.next(), self.entity_manager)
+        self.entity_manager.add_component(y, MeshComponent(
+        Square((50,50,100), 20, Color.White, textures[2])
+        ))
+        self.entity_manager.add_component(y, MouseClickComponent("Stay away!"))
 
         # Note that higher Z = closer to camera 
-        self.entities = [tempClass2(Color.next(),Square((100,100,100), 100, Color.White, textures[1])) ]#,
-        # 				 tempClass(Color.next(),Square((100,100,100), 10, Color.Blue)),
-        # 				 tempClass(Color.next(),Triangle((100,150,100), 20, Color.Red, texture)), 
-        # 				 tempClass(Color.next(),Color.Green,[[-70, -70, 100],  [-70, +70, 100],   [+70, 70, 100]],[[0,1,2]]),
-        # 				 tempClass(Color.next(),Color.Yellow,[[-20, -20, 150],  [-20, +20, 150],   [+20, 20, 150], [20, -20, 150]],[[0,1,2], [2,3,0]])]
 
-        # Entities go here
+
         # Can explicitly call functions on a timer
         # Only methods called from here need a dt
         # Methods called from mainLoop don't
@@ -163,8 +160,6 @@ class World(object):
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity()
         self.pick_manager.update(0.5)
-        # # for ent in self.entities:
-        # #     ent.fboDraw()
         self.fbo.detach()
 
 
@@ -183,7 +178,6 @@ class Game(object):
 
     def mainLoop(self):
         while not self.window.has_exit:
-            #print("start")
             self.window.dispatch_events()
 
             self.world.update()
@@ -196,7 +190,6 @@ class Game(object):
 
             clock.tick()
             self.window.flip()
-            #print("end")
 game = Game()
 
 @game.window.event
@@ -218,9 +211,6 @@ def on_mouse_press(x, y, button, modifiers):
     print(aa[0], aa[1], aa[2])
     
     # Find the entity with the corresponding color
-    # for ent in game.world.entities:
-    #     if ent.handle == Color(aa[0], aa[1], aa[2]):
-    #         ent.onClick(0,0)
     for e, mesh in game.world.entity_manager.pairs_for_type(MeshComponent):
         if e.color == Color(aa[0], aa[1], aa[2]):
             game.world.entity_manager.component_for_entity(e, MouseClickComponent).onClick(x, y)
