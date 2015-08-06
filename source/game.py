@@ -20,6 +20,9 @@ from random import randint
 from color import *
 from util import *
 
+from systems import *
+from components import *
+
 GAME_TICKS_PER_SECOND 	= 60.0 
 PICK_TOLERANCE 			= 3
 PICK_BUFFER_SIZE 		= 256
