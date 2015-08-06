@@ -86,6 +86,7 @@ class World(object):
         # The entity manager for objects in the game
         self.entity_manager = EntityManager()
         self.system_manager = SystemManager(self.entity_manager)
+        self.system_manager.add_system(HealthSystem()) 
 
         # The render manager. Updates to redraw graphics
         self.render_manager = SystemManager(self.entity_manager)
@@ -105,6 +106,7 @@ class World(object):
         colorList=Color.Red
         ))
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
+        x.addComponent(Health(10))
 
         y = tempClass3(Color.next(), self.entity_manager)
         y.addComponent(MeshComponent(
@@ -189,7 +191,7 @@ def on_mouse_press(x, y, button, modifiers):
     # Find the entity with the corresponding color
     for e, mesh in game.world.entity_manager.pairs_for_type(MeshComponent):
         if e.color == Color(aa[0], aa[1], aa[2]):
-            game.world.entity_manager.component_for_entity(e, MouseClickComponent).onClick(x, y)
+            game.world.entity_manager.component_for_entity(e, MouseClickComponent).onClick(e, x, y)
     # Release the picking frame buffer
     game.world.fbo.detach()
 
