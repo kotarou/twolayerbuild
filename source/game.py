@@ -5,7 +5,7 @@
 from pyglet import *
 from pyglet.gl import *
 from fbo import *
-
+from ecs.exceptions import *
 import numpy as np
 
 from entity import *
@@ -71,7 +71,7 @@ class World(object):
     def __init__(self):
         # Set up a framebuffer object
         self.fbo = FBO(800, 600)
-
+        self.hoverItem = None
         # load the example texture
         tile_file = pyglet.image.load('resources/floor_tiles.png')
         sections = []
@@ -106,6 +106,7 @@ class World(object):
         colorList=Color.Red
         ))
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
+        x.addComponent(MouseHoverComponent("Hovered!"))
         x.addComponent(Health(10))
 
         y = tempClass3(Color.next(), self.entity_manager)
@@ -124,6 +125,7 @@ class World(object):
 
     def update(self):
         self.system_manager.update(0.5)
+        self.hover()
 
     def draw(self):
         # Render the current frame
@@ -140,6 +142,9 @@ class World(object):
         self.pick_manager.update(0.5)
         self.fbo.detach()
 
+    def hover(self):
+        if self.hoverItem != None:
+            self.entity_manager.component_for_entity(self.hoverItem, MouseHoverComponent).onHover(self.hoverItem, 0, 0)
 
 
 class Game(object):
@@ -147,6 +152,7 @@ class Game(object):
     def __init__(self):
         self.world = World()
         self.window = window.Window(800,600, vsync=True)#fullscreen=True, vsync=True)
+        self.window.push_handlers(pyglet.window.event.WindowEventLogger())
         self.camera = TopDownCamera(self.window)
         self.hud = Hud(self.window)
         clock.set_fps_limit(60)
@@ -191,10 +197,34 @@ def on_mouse_press(x, y, button, modifiers):
     # Find the entity with the corresponding color
     for e, mesh in game.world.entity_manager.pairs_for_type(MeshComponent):
         if e.color == Color(aa[0], aa[1], aa[2]):
-            game.world.entity_manager.component_for_entity(e, MouseClickComponent).onClick(e, x, y)
+            try:
+                game.world.entity_manager.component_for_entity(e, MouseClickComponent).onClick(e, x, y)
+            except NonexistentComponentTypeForEntity:
+                pass
     # Release the picking frame buffer
     game.world.fbo.detach()
 
+@game.window.event                       
+def on_mouse_motion(x, y, dx, dy):
+    # Swap the the frame buffer where picking colors are drawn
+    game.world.fbo.attach()
+    # Set up storage for the pixel we click on
+    aa = (GLubyte  * 3)(0)
+    # Find the color of the pixel we clicked on
+    pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
+    game.world.hoverItem = None
+    # Find the entity with the corresponding color
+    for e, mesh in game.world.entity_manager.pairs_for_type(MeshComponent):
+        if e.color == Color(aa[0], aa[1], aa[2]):
+            try:
+                game.world.entity_manager.component_for_entity(e, MouseHoverComponent)
+                game.world.hoverItem = e
+                break
+            except NonexistentComponentTypeForEntity:
+                game.world.hoverItem = None
+
+    # Release the picking frame buffer
+    game.world.fbo.detach()
 
 
 game.mainLoop()
