@@ -15,21 +15,19 @@ from ecs.exceptions import NonexistentComponentTypeForEntity
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
-class Element(object):
+class Element(Entity):
     """ 
         An object
     """
-
-    def __init__(self, handle):
-        """
-        glColor3f handle
-        """
-        # An object should have a unique handle
-        self.handle = handle
-
-class tempClass3(Entity):
     def __init__(self, color, eman):
         self.eman = eman
         self.color = color
         super().__init__(int(color.r*255*255+color.g*255+color.b))
+
+    def addComponent(self, component):
+        self.eman.add_component(self, component) 
+
+class tempClass3(Element):
+    def __init__(self, color, eman):
+        super().__init__(color, eman)
 

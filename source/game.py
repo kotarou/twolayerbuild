@@ -95,35 +95,8 @@ class World(object):
         self.pick_manager = SystemManager(self.entity_manager)
         self.pick_manager.add_system(PickSystem())
 
-        self.entities = []
-        # for i in range(10):
-        #     for j in range(10):
-        #         x = randint(0, 2)
-        #         self.entities.append(
-        #             tempClass2(Color.next(),Square((i*20,j*20,100), 20, Color.White, textures[x]))
-        #         )
-
-        # self.entities.append(
-        #             tempClass2(Color.next(),Square((-100,-100,100), 40, Color(50,100,100)))
-        #         )
-        # self.entities.append(
-        #             tempClass2(Color.next(),Square((-140,-100,100), 40, Color(100,100,100)))
-        #         )
-        # self.entities.append(
-        #             tempClass2(Color.next(),Square((-180,-100,100), 40, Color(150,100,100)))
-        #         )
-        # self.entities.append(
-        #             tempClass2(Color.next(),Square((-100,-140,100), 40, Color(100,100,100).darken()))
-        #         )
-        # self.entities.append(
-        #             tempClass2(Color.next(),Square((-140,-140,100), 40, Color(100,100,100)))
-        #         )
-        # self.entities.append(
-        #             tempClass2(Color.next(),Square((-180,-140,100), 40, Color(100,100,100).brighten()))
-        #         )
-
         x = tempClass3(Color.next(), self.entity_manager)
-        self.entity_manager.add_component(x, MeshComponent(
+        x.addComponent(MeshComponent(
         vertexList = [ [100, -100, 0],  
                             [100, 100, 0],   
                             [-100, 100, 0]],
@@ -131,13 +104,13 @@ class World(object):
         colored=True,
         colorList=Color.Red
         ))
-        self.entity_manager.add_component(x, MouseClickComponent("Look at me, I'm red!"))
+        x.addComponent(MouseClickComponent("Look at me, I'm red!"))
 
         y = tempClass3(Color.next(), self.entity_manager)
-        self.entity_manager.add_component(y, MeshComponent(
+        y.addComponent(MeshComponent(
         Square((50,50,100), 20, Color.White, textures[2])
         ))
-        self.entity_manager.add_component(y, MouseClickComponent("Stay away!"))
+        y.addComponent(MouseClickComponent("Stay away!"))
 
         # Note that higher Z = closer to camera 
 
