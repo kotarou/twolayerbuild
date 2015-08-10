@@ -119,7 +119,11 @@ class World(object):
         ))
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
         #x.addComponent(MouseHoverComponent("Hovered!"))
-        x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
+        #x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
+        x.addComponent(KeyPressComponent({
+            Key(key.A, 0): "Hello!",
+            Key(key.Q, key.MOD_SHIFT, True): "Yo!"
+            }))
         x.addComponent(KeyHoldComponent(Key(key.B, 0), "grrrr!"))
         x.addComponent(Health(10))
 
@@ -175,7 +179,8 @@ class Game(object):
 
         self.world = World()
         self.window = window.Window(800,600, vsync=True)#fullscreen=True, vsync=True)
-        self.window.push_handlers(pyglet.window.event.WindowEventLogger())
+        
+        #self.window.push_handlers(pyglet.window.event.WindowEventLogger())
         
         self.window.push_handlers(keys)
 
@@ -274,11 +279,13 @@ def on_key_press(symbol, modifiers):
     # React to the key press
     #print(modifiers)
     for e, responder in game.world.entity_manager.pairs_for_type(KeyPressComponent):
-        if responder.key == Key(symbol, modifiers):
-                responder.respond()
+        #print(responder.actions, Key(symbol, modifiers))
+        if Key(symbol, modifiers) in responder.actions.keys():
+            responder.respond(Key(symbol, modifiers))
+        #if responder.key == Key(symbol, modifiers):
+        #        responder.respond()
     # Add the key to the holding list
     for e, holder in game.world.entity_manager.pairs_for_type(KeyHoldComponent):
-        print(holder.key, Key(symbol, modifiers))
         if holder.key == Key(symbol, modifiers):
                 print("aaaaaaa ", symbol, holder.key)
                 holder.active = True
