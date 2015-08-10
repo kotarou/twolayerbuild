@@ -124,7 +124,11 @@ class World(object):
             Key(key.A, 0): "Hello!",
             Key(key.Q, key.MOD_SHIFT, True): "Yo!"
             }))
-        x.addComponent(KeyHoldComponent(Key(key.B, 0), "grrrr!"))
+        #x.addComponent(KeyHoldComponent(Key(key.B, 0), "grrrr!"))
+        x.addComponent(KeyHoldComponent({
+            Key(key.W, 0): "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+            Key(key.S, key.MOD_SHIFT, True): "sssssssssssssssssss"
+            }))
         x.addComponent(Health(10))
 
         y = tempClass3(Color.next(), self.entity_manager)
@@ -286,15 +290,16 @@ def on_key_press(symbol, modifiers):
         #        responder.respond()
     # Add the key to the holding list
     for e, holder in game.world.entity_manager.pairs_for_type(KeyHoldComponent):
-        if holder.key == Key(symbol, modifiers):
-                print("aaaaaaa ", symbol, holder.key)
-                holder.active = True
+        if Key(symbol, modifiers) in holder.actions.keys():
+            holder.active.append(Key(symbol, modifiers))
 
 @game.window.event
 def on_key_release(symbol, modifiers):
     for e, holder in game.world.entity_manager.pairs_for_type(KeyHoldComponent):
-        if holder.key == Key(symbol, modifiers):
-                holder.active = False
+        if Key(symbol, modifiers) in holder.actions.keys():
+            holder.active.remove(Key(symbol, modifiers))
+        # if holder.key == Key(symbol, modifiers):
+        #         holder.active = False
 
 
 game.mainLoop()
