@@ -20,6 +20,7 @@ except ImportError:
 
 from random import randint
 from color import *
+from components.KeyComponent import Key
 from util import *
 
 from systems import *
@@ -118,8 +119,8 @@ class World(object):
         ))
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
         #x.addComponent(MouseHoverComponent("Hovered!"))
-        x.addComponent(KeyPressComponent(key.A, False, None, "Hello!"))
-        x.addComponent(KeyHoldComponent(key.B, False, None, "grrrr!"))
+        x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
+        x.addComponent(KeyHoldComponent(Key(key.B, 0), "grrrr!"))
         x.addComponent(Health(10))
 
         y = tempClass3(Color.next(), self.entity_manager)
@@ -169,9 +170,15 @@ class World(object):
 class Game(object):
 
     def __init__(self):
+        global keys 
+        keys = key.KeyStateHandler()
+
         self.world = World()
         self.window = window.Window(800,600, vsync=True)#fullscreen=True, vsync=True)
         self.window.push_handlers(pyglet.window.event.WindowEventLogger())
+        
+        self.window.push_handlers(keys)
+
         self.camera = TopDownCamera(self.window)
         self.hud = Hud(self.window)
         clock.set_fps_limit(60)
@@ -267,29 +274,19 @@ def on_key_press(symbol, modifiers):
     # React to the key press
     #print(modifiers)
     for e, responder in game.world.entity_manager.pairs_for_type(KeyPressComponent):
-        if responder.symbol == symbol:
-            if responder.modMatters:
-                if responder.modifiers == modifiers:
-                    responder.respond()
-            else:
+        if responder.key == Key(symbol, modifiers):
                 responder.respond()
     # Add the key to the holding list
     for e, holder in game.world.entity_manager.pairs_for_type(KeyHoldComponent):
-        if holder.symbol == symbol:
-            if holder.modMatters:
-                if holder.modifiers == modifiers:
-                    holder.active = True
-            else:
+        print(holder.key, Key(symbol, modifiers))
+        if holder.key == Key(symbol, modifiers):
+                print("aaaaaaa ", symbol, holder.key)
                 holder.active = True
 
 @game.window.event
 def on_key_release(symbol, modifiers):
     for e, holder in game.world.entity_manager.pairs_for_type(KeyHoldComponent):
-        if holder.symbol == symbol:
-            if holder.modMatters:
-                if holder.modifiers == modifiers:
-                    holder.active = False
-            else:
+        if holder.key == Key(symbol, modifiers):
                 holder.active = False
 
 
