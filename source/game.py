@@ -117,17 +117,25 @@ class World(object):
         colored=True,
         colorList=Color.Red
         ))
+        parseString = """
+from components.HealthComponent import Health
+print('hello')
+for ee, health in e.eman.pairs_for_type(Health):
+    if ee == e:
+        health.hp = 10;
+        print(health.hp)
+        """
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
         #x.addComponent(MouseHoverComponent("Hovered!"))
         #x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
         x.addComponent(KeyPressComponent({
-            Key(key.A, 0): "Hello!",
-            Key(key.Q, key.MOD_SHIFT, True): "Yo!"
+            Key(key.A, 0): 'print("a")',
+            Key(key.Q, key.MOD_SHIFT, True): 'print("Yo!")'
             }))
         #x.addComponent(KeyHoldComponent(Key(key.B, 0), "grrrr!"))
         x.addComponent(KeyHoldComponent({
-            Key(key.W, 0): "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
-            Key(key.S, key.MOD_SHIFT, True): "sssssssssssssssssss"
+            Key(key.W, 0): parseString,
+            Key(key.S, key.MOD_SHIFT, True): 'print("sssssssssssssssssss")'
             }))
         x.addComponent(Health(10))
 
