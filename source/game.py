@@ -11,6 +11,8 @@ import numpy as np
 from entity import *
 from camera import *
 
+from pyglet.window import key
+
 try:
     import Queue as Q  # ver. < 3.0
 except ImportError:
@@ -61,8 +63,8 @@ class Hud(object):
         self.fps = clock.ClockDisplay()
 
     def draw(self):
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
         self.text.draw()
         self.fps.draw()
 
@@ -72,6 +74,8 @@ class World(object):
         # Set up a framebuffer object
         self.fbo = FBO(800, 600)
         self.hoverItem = None
+        self.hoverSwap = False
+        self.lastTime = 0
         # load the example texture
         tile_file = pyglet.image.load('resources/floor_tiles.png')
         sections = []
@@ -84,9 +88,16 @@ class World(object):
         textures.append(sections[2].get_texture())
 
         # The entity manager for objects in the game
+        # These components should update every tick
         self.entity_manager = EntityManager()
         self.system_manager = SystemManager(self.entity_manager)
-        self.system_manager.add_system(HealthSystem()) 
+        self.system_manager.add_system(HealthSystem())
+        self.system_manager.add_system(MouseHoverSystem())
+
+        # The manager for user inputs
+        # These should only input when a user makes an action
+        self.ui_manager = SystemManager(self.entity_manager)
+        self.ui_manager.add_system(KeyHoldSystem())
 
         # The render manager. Updates to redraw graphics
         self.render_manager = SystemManager(self.entity_manager)
@@ -106,7 +117,9 @@ class World(object):
         colorList=Color.Red
         ))
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
-        x.addComponent(MouseHoverComponent("Hovered!"))
+        #x.addComponent(MouseHoverComponent("Hovered!"))
+        x.addComponent(KeyPressComponent(key.A, False, None, "Hello!"))
+        x.addComponent(KeyHoldComponent(key.B, False, None, "grrrr!"))
         x.addComponent(Health(10))
 
         y = tempClass3(Color.next(), self.entity_manager)
@@ -124,8 +137,11 @@ class World(object):
         #clock.schedule_interval(self.update, 0.25)
 
     def update(self):
-        self.system_manager.update(0.5)
+        time = Util.time()
+        self.ui_manager.update(time-self.lastTime)
+        self.system_manager.update(time-self.lastTime)
         self.hover()
+        self.lastTime = time
 
     def draw(self):
         # Render the current frame
@@ -143,8 +159,11 @@ class World(object):
         self.fbo.detach()
 
     def hover(self):
-        if self.hoverItem != None:
-            self.entity_manager.component_for_entity(self.hoverItem, MouseHoverComponent).onHover(self.hoverItem, 0, 0)
+        pass
+        # if not self.hoverSwap:
+
+        # if self.hoverItem != None:
+        #     self.entity_manager.component_for_entity(self.hoverItem, MouseHoverComponent).onHover(self.hoverItem, 0, 0)
 
 
 class Game(object):
@@ -198,6 +217,7 @@ def on_mouse_press(x, y, button, modifiers):
     for e, mesh in game.world.entity_manager.pairs_for_type(MeshComponent):
         if e.color == Color(aa[0], aa[1], aa[2]):
             try:
+                # TODO move logic into a click system
                 game.world.entity_manager.component_for_entity(e, MouseClickComponent).onClick(e, x, y)
             except NonexistentComponentTypeForEntity:
                 pass
@@ -213,18 +233,64 @@ def on_mouse_motion(x, y, dx, dy):
     # Find the color of the pixel we clicked on
     pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
     game.world.hoverItem = None
+    
+    # Slow, but handles mousing off something
+    for e, h in game.world.entity_manager.pairs_for_type(MouseHoverComponent):
+        h.active = False
+
+    # TODO add something for caching the previously hovered item.
+
+    # TODO construct map of color_id <=> object, find object from id. 
+    #   Update such a map whenever I add a new meshcomponent.
+    #   Basically, build something off ECS instead of simply using ECS at this point.
+
     # Find the entity with the corresponding color
     for e, mesh in game.world.entity_manager.pairs_for_type(MeshComponent):
         if e.color == Color(aa[0], aa[1], aa[2]):
             try:
-                game.world.entity_manager.component_for_entity(e, MouseHoverComponent)
-                game.world.hoverItem = e
+                h = game.world.entity_manager.component_for_entity(e, MouseHoverComponent)
+                h.active = True
+                if game.world.hoverItem != e:
+                    game.world.hoverSwap = True
+                    game.world.hoverItem = e
+                else:
+                    game.world.hoverSwap = False
                 break
             except NonexistentComponentTypeForEntity:
                 game.world.hoverItem = None
 
     # Release the picking frame buffer
     game.world.fbo.detach()
+
+@game.window.event
+def on_key_press(symbol, modifiers):
+    # React to the key press
+    #print(modifiers)
+    for e, responder in game.world.entity_manager.pairs_for_type(KeyPressComponent):
+        if responder.symbol == symbol:
+            if responder.modMatters:
+                if responder.modifiers == modifiers:
+                    responder.respond()
+            else:
+                responder.respond()
+    # Add the key to the holding list
+    for e, holder in game.world.entity_manager.pairs_for_type(KeyHoldComponent):
+        if holder.symbol == symbol:
+            if holder.modMatters:
+                if holder.modifiers == modifiers:
+                    holder.active = True
+            else:
+                holder.active = True
+
+@game.window.event
+def on_key_release(symbol, modifiers):
+    for e, holder in game.world.entity_manager.pairs_for_type(KeyHoldComponent):
+        if holder.symbol == symbol:
+            if holder.modMatters:
+                if holder.modifiers == modifiers:
+                    holder.active = False
+            else:
+                holder.active = False
 
 
 game.mainLoop()

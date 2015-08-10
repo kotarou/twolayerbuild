@@ -6,14 +6,12 @@ import numpy as np
 #import pyglet 
 import pyglet.graphics as pg
 from pyglet.gl import *
-import time
+
 import ctypes
 
 from ecs.models import Component, System, Entity
 from ecs.managers import EntityManager, SystemManager
 from ecs.exceptions import NonexistentComponentTypeForEntity
-
-current_milli_time = lambda: int(round(time.time() * 1000))
 
 class Element(Entity):
     """ 

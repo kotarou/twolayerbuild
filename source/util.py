@@ -3,6 +3,11 @@
 @author: Kotarou
 """
 from color import *
+import time
+
+class Util:
+    def time(): 
+        return int(round(time.time() * 1000))
 
 class Shape(object):
     def __init__(self, color=None, texture=None):
