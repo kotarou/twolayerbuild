@@ -104,18 +104,6 @@ class World(object):
 
         self.system_manager.addSystem("render", RenderSystem())
         self.system_manager.addSystem("pick", PickSystem())
-        # # The manager for user inputs
-        # # These should only input when a user makes an action
-        # self.ui_manager = SystemManager(self.entity_manager)
-        # self.ui_manager.add_system(KeyHoldSystem())
-
-        # # The render manager. Updates to redraw graphics
-        # self.render_manager = SystemManager(self.entity_manager)
-        # self.render_manager.add_system(RenderSystem())
-
-        # # The pick manager. Updates to a seperate framebuffer than render_manager
-        # self.pick_manager = SystemManager(self.entity_manager)
-        # self.pick_manager.add_system(PickSystem())
 
         x = tempClass3(Color.next(), self.entity_manager)
         x.addComponent(MeshComponent(
@@ -173,7 +161,7 @@ print("hi!!!")
         glLoadIdentity()
         self.system_manager.update("render",cTime-self.lastTime)
 
-        # # Render the current picking frame
+        # Render the current picking frame
         self.fbo.attach()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glMatrixMode(GL_MODELVIEW);
@@ -225,7 +213,6 @@ def on_mouse_press(x, y, button, modifiers):
         button		:	(int)	The mouse button that was pressed. 1 = left click, 4 = right click
         modifiers	:	(int)	Modifying keys that were pressed in conjunction with the mouse
     """
-    print("Mouse clicked")
 
     # Swap the the frame buffer where picking colors are drawn
     game.world.fbo.attach()
@@ -233,9 +220,12 @@ def on_mouse_press(x, y, button, modifiers):
     aa = (GLubyte  * 3)(0)
     # Find the color of the pixel we clicked on
     pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
-    print(aa[0], aa[1], aa[2])
+
+    # Generate the id of the color we cllicked on
     cid = Color(aa[0], aa[1], aa[2]).toID()
 
+    # Search for the mesh with id in the database of color ids
+    # If we find it, run the on Click event for each MouseClickComponent attached to the owner of the mesh we clicked on
     try:
         mesh = game.world.entity_manager.cidDatabase[cid]
         for clickable in game.world.entity_manager.componentByType(mesh.owner, MouseClickComponent):
@@ -243,18 +233,16 @@ def on_mouse_press(x, y, button, modifiers):
     except KeyError:
         pass
 
-
-        # if e.color == Color(aa[0], aa[1], aa[2]):
-        #     try:
-        #         # TODO move logic into a click system
-        #         game.world.entity_manager.component_for_entity(e, MouseClickComponent).onClick(e, x, y)
-        #     except NonexistentComponentTypeForEntity:
-        #         pass
     # Release the picking frame buffer
     game.world.fbo.detach()
 
 @game.window.event
 def on_mouse_motion(x, y, dx, dy):
+    """
+        Event that fires whenever the mouse moves
+        x, y        :   (int)   The coordinates of the mouse location in screen-space
+        dx, dy      :   (int)   The change in mouse position
+    """
     # Swap the the frame buffer where picking colors are drawn
     game.world.fbo.attach()
     # Set up storage for the pixel we click on
@@ -263,17 +251,19 @@ def on_mouse_motion(x, y, dx, dy):
     pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
     cid = Color(aa[0], aa[1], aa[2]).toID()
 
-
     try:
         mesh = game.world.entity_manager.cidDatabase[cid]
+        # If a different object was hovered on, set its hover state to false
         if game.world.hoverItem != mesh.owner and game.world.hoverItem is not None:
             for hoverable in game.world.entity_manager.componentByType(game.world.hoverItem, MouseHoverComponent):
                 hoverable.active = False
+        # Set the hover state of the current object to True
         for hoverable in game.world.entity_manager.componentByType(mesh.owner, MouseHoverComponent):
             hoverable.active = True
         print("Hovering over object at", x, y)
         game.world.hoverItem = mesh.owner
     except KeyError:
+        # We are hovering over nothing.
         if game.world.hoverItem is not None:
             for hoverable in game.world.entity_manager.componentByType(game.world.hoverItem, MouseHoverComponent):
                 hoverable.active = False
@@ -284,9 +274,15 @@ def on_mouse_motion(x, y, dx, dy):
 
 @game.window.event
 def on_key_press(symbol, modifiers):
-    # React to the key press
-    #print(modifiers)
+    """
+        Event that fires whenever a key is pressed.
+        symbol      :   (key)   The key that was pressed
+        modifiers   :   (int)   Modifying keys that were pressed in conjunction.
+                                To test if a modifier was pressed, use modifiers & key.MOD_SHIFT > 0
+    """
+    # Set up a "dummy" key to check against
     k = Key(symbol, modifiers)
+    # React to the key press
     for e, responder in game.world.entity_manager.pairsForType(KeyPressComponent):
         if k in responder.actions.keys():
             responder.respond(k)
@@ -298,11 +294,16 @@ def on_key_press(symbol, modifiers):
 
 @game.window.event
 def on_key_release(symbol, modifiers):
+    """
+        Event that fires whenever a key is released.
+        symbol      :   (key)   The key that was released
+        modifiers   :   (int)   Modifying keys that were pressed in conjunction.
+                                To test if a modifier was pressed, use modifiers & key.MOD_SHIFT > 0
+    """
     for e, holder in game.world.entity_manager.pairsForType(KeyHoldComponent):
         if Key(symbol, modifiers) in holder.actions.keys():
             holder.active.remove(Key(symbol, modifiers))
-        # if holder.key == Key(symbol, modifiers):
-        #         holder.active = False
+
 
 
 game.mainLoop()
