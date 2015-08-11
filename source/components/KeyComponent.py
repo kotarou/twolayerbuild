@@ -29,10 +29,11 @@ class Key(namedtuple('__KeyCombination', 'symbol modifiers modMatters')):
         if other == None:
             return False
 
-        #print("aaaaa", symbol, other.symbol, other[0], other)
+        #the left is what we want to be pushed (normally) mand the right is what is being pushed (again, normally)
+
 
         if symbol == other.symbol:
-            if not modMatters or (modifiers & other.modifiers == 1): # (not modMatters and not other.modMatters) 
+            if not modMatters or (modifiers & other.modifiers): # (not modMatters and not other.modMatters) 
                 return True
         return False
 

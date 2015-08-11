@@ -147,6 +147,7 @@ for ee, health in e.eman.pairs_for_type(Health):
 
         # Note that higher Z = closer to camera 
 
+        print(y.getComponents())
 
         # Can explicitly call functions on a timer
         # Only methods called from here need a dt
