@@ -100,7 +100,7 @@ class World(object):
         self.system_manager.addSystem("component", HealthSystem())
         self.system_manager.addSystem("interaction", MouseHoverSystem())
 
-        #self.system_manager.addSystem("interaction", KeyHoldSystem())
+        self.system_manager.addSystem("interaction", KeyHoldSystem())
 
         self.system_manager.addSystem("render", RenderSystem())
         self.system_manager.addSystem("pick", PickSystem())
@@ -127,18 +127,13 @@ class World(object):
         colorList=Color.Red
         ))
         parseString = """
-from components.HealthComponent import Health
-print('hello')
-for ee, health in e.eman.pairs_for_type(Health):
-    if ee == e:
-        health.hp = 10;
-        print(health.hp)
+print("hi!!!")
         """
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
         x.addComponent(MouseHoverComponent("Hovered!"))
         #x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
         x.addComponent(KeyPressComponent({
-            Key(key.A, 0): 'print("a")',
+            Key(key.A, 0): 'print("asdf")',
             Key(key.Q, key.MOD_SHIFT, True): 'print("Yo!")'
             }))
         #x.addComponent(KeyHoldComponent(Key(key.B, 0), "grrrr!"))
@@ -284,35 +279,6 @@ def on_mouse_motion(x, y, dx, dy):
                 hoverable.active = False
         game.world.hoverItem = None
 
-
-
-    # # Slow, but handles mousing off something
-    # for e, h in game.world.entity_manager.pairsForType(MouseHoverComponent):
-    #     h.active = False
-
-    # TODO add something for caching the previously hovered item.
-
-    # TODO construct map of color_id <=> object, find object from id.
-    #   Update such a map whenever I add a new meshcomponent.
-    #   Basically, build something off ECS instead of simply using ECS at this point.
-
-    # Find the entity with the corresponding color
-
-
-    # for e, mesh in game.world.entity_manager.pairsForType(MeshComponent):
-    #     if e.color == Color(aa[0], aa[1], aa[2]):
-    #         try:
-    #             h = game.world.entity_manager.component_for_entity(e, MouseHoverComponent)
-    #             h.active = True
-    #             if game.world.hoverItem != e:
-    #                 game.world.hoverSwap = True
-    #                 game.world.hoverItem = e
-    #             else:
-    #                 game.world.hoverSwap = False
-    #             break
-    #         except NonexistentComponentTypeForEntity:
-    #             game.world.hoverItem = None
-
     # Release the picking frame buffer
     game.world.fbo.detach()
 
@@ -320,20 +286,19 @@ def on_mouse_motion(x, y, dx, dy):
 def on_key_press(symbol, modifiers):
     # React to the key press
     #print(modifiers)
-    for e, responder in game.world.entity_manager.pairs_for_type(KeyPressComponent):
-        #print(responder.actions, Key(symbol, modifiers))
-        if Key(symbol, modifiers) in responder.actions.keys():
-            responder.respond(Key(symbol, modifiers))
-        #if responder.key == Key(symbol, modifiers):
-        #        responder.respond()
+    k = Key(symbol, modifiers)
+    for e, responder in game.world.entity_manager.pairsForType(KeyPressComponent):
+        if k in responder.actions.keys():
+            responder.respond(k)
+
     # Add the key to the holding list
-    for e, holder in game.world.entity_manager.pairs_for_type(KeyHoldComponent):
-        if Key(symbol, modifiers) in holder.actions.keys():
+    for e, holder in game.world.entity_manager.pairsForType(KeyHoldComponent):
+        if k in holder.actions.keys():
             holder.active.append(Key(symbol, modifiers))
 
 @game.window.event
 def on_key_release(symbol, modifiers):
-    for e, holder in game.world.entity_manager.pairs_for_type(KeyHoldComponent):
+    for e, holder in game.world.entity_manager.pairsForType(KeyHoldComponent):
         if Key(symbol, modifiers) in holder.actions.keys():
             holder.active.remove(Key(symbol, modifiers))
         # if holder.key == Key(symbol, modifiers):

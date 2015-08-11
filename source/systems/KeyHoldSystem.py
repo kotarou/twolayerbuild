@@ -15,10 +15,9 @@ class KeyHoldSystem(System):
 
     def update (self, dt):
         try:
-            for e, holders in self.eman.pairsForType(KeyHoldComponent):
-                for holder in holders:
-                    for k, a in holder.actions.items():
-                        if k in holder.active:
-                            holder.parse(e, a)
+            for e, holder in self.eman.pairsForType(KeyHoldComponent):
+                for k, a in holder.actions.items():
+                    if k in holder.active:
+                        holder.parse(a)
         except TypeError:
             raise Exception("KeyholdSystem without any KeyHoldComponents")

@@ -51,7 +51,7 @@ class KeyComponent(Component):
     def __init__(self):
         super().__init__()
 
-    def parse(self, e, input):
+    def parse(self, input):
         exec(input, locals(), locals())
 
 

@@ -12,11 +12,5 @@ class KeyPressSystem(System):
         super().__init__()
 
     def update (self, dt):
-        for e, hovers in self.eman.pairsforType(MouseHoverComponent):
-            for hover in hovers:
-                if hover.active:
-                    print(hover.response)
-                    hover.hoverTime += dt
-                    print(hover.hoverTime)
-                else:
-                    hover.hoverTime = 0
+        # This class doesn't actually do anything
+        pass
