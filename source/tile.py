@@ -4,7 +4,7 @@ import pyglet
 
 class Tile:
 
-    __metacass__ = ABCMeta
+    __metaclass__ = ABCMeta
 
     name = ""
     description = ""
@@ -14,16 +14,16 @@ class Tile:
     draw = ""
     owner = ""
 
+    # refers to index in list, should eventually be a dict and by name
+    texture = 0
+
     pos = ([0.0, 0.0])
-    
+
     def __init__(self, identifier, owner, inX, inY):
         self.identifier = identifier
         self.pos[0] = inX
         self.pos[1] = inY
         self.owner = owner
-
-    @abstractmethod
-    def draw(self): pass
 
     # TODO: is called when an entity moves onto this tile?
     #	When some other things calls its trigger?

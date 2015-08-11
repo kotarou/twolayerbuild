@@ -1,4 +1,6 @@
 import pyglet, tile, os
+# lets assume we are calling from the source dir
+mapname = os.path.join('resources','map.dat')
 
 class Map:
 
@@ -7,7 +9,13 @@ class Map:
 
   # basically test code atm
   def __init__(self):
-    createTileObject((0,True, "."))
+    # First we load the map
+    # Config file is in root of the project
+    mappath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapname)
+    self.load(mappath)
+
+
+    self.createTileObject((0,True, "."))
     createRoom(tileDict[0], 0, 0, 0, 5, 5)
     for rooms in roomDict:
       for tiles in rooms:
@@ -30,7 +38,6 @@ class Map:
   #  Then dereferencing it from the map itself
 
   def createRoom(self, tileNameIn, roomNameIn, xStart, yStart, xEnd, yEnd):
-
     for i in range(xStart, xEnd):
       for j in range(yStart, yEnd):
         roomDict[roomNameIn] += tileDict[tileNameIn].init(roomDict[roomNameIn], i, j)
