@@ -13,13 +13,12 @@ class MouseHoverSystem(System):
 
     def update (self, dt):
         try:
-            for e, hovers in self.eman.pairsForType(MouseHoverComponent):
-                for hover in hovers:
-                    if hover.active:
-                        print(hover.response)
-                        hover.hoverTime += dt
-                        print(hover.hoverTime)
-                    else:
-                        hover.hoverTime = 0
+            for e, hover in self.eman.pairsForType(MouseHoverComponent):
+                if hover.active:
+                    print(hover.response)
+                    hover.hoverTime += dt
+                    print(hover.hoverTime)
+                else:
+                    hover.hoverTime = 0
         except TypeError:
             raise Exception("Mouse Hover System invoked without any mouse hover components")

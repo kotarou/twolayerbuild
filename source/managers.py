@@ -112,7 +112,7 @@ class EntityManager(object):
 
     def componentByType(self,entity, component):
         try:
-            return [k for (j,k) in self._dbCID.items() if type(k) == cType and k.owner == entity]
+            return [k for (j,k) in self._dbCID.items() if type(k) == component and k.owner == entity]
         except KeyError:
             return None
 

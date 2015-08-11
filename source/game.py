@@ -98,7 +98,7 @@ class World(object):
         self.entity_manager = EntityManager()
         self.system_manager = SystemManager(self.entity_manager)
         self.system_manager.addSystem("component", HealthSystem())
-        #self.system_manager.addSystem("interaction", MouseHoverSystem())
+        self.system_manager.addSystem("interaction", MouseHoverSystem())
 
         #self.system_manager.addSystem("interaction", KeyHoldSystem())
 
@@ -135,7 +135,7 @@ for ee, health in e.eman.pairs_for_type(Health):
         print(health.hp)
         """
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
-        #x.addComponent(MouseHoverComponent("Hovered!"))
+        x.addComponent(MouseHoverComponent("Hovered!"))
         #x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
         x.addComponent(KeyPressComponent({
             Key(key.A, 0): 'print("a")',
@@ -167,8 +167,7 @@ for ee, health in e.eman.pairs_for_type(Health):
         cTime = currTime()
         #self.ui_manager.update(time-self.lastTime)
         self.system_manager.update("component",cTime-self.lastTime)
-        #self.system_manager.update("interaction",cTime-self.lastTime)
-        self.hover()
+        self.system_manager.update("interaction",cTime-self.lastTime)
         self.lastTime = cTime
 
     def draw(self):
@@ -186,14 +185,6 @@ for ee, health in e.eman.pairs_for_type(Health):
         glLoadIdentity()
         self.system_manager.update("pick",cTime-self.lastTime)
         self.fbo.detach()
-
-    def hover(self):
-        pass
-        # if not self.hoverSwap:
-
-        # if self.hoverItem != None:
-        #     self.entity_manager.component_for_entity(self.hoverItem, MouseHoverComponent).onHover(self.hoverItem, 0, 0)
-
 
 class Game(object):
 
@@ -252,11 +243,8 @@ def on_mouse_press(x, y, button, modifiers):
 
     try:
         mesh = game.world.entity_manager.cidDatabase[cid]
-        print(game.world.entity_manager.componentByType(mesh.owner, MouseClickComponent))
         for clickable in game.world.entity_manager.componentByType(mesh.owner, MouseClickComponent):
-            for c in clickable:
-                print(c)
-                c.onClick(mesh.owner, x, y)
+            clickable.onClick(mesh.owner, x, y)
     except KeyError:
         pass
 
@@ -278,12 +266,23 @@ def on_mouse_motion(x, y, dx, dy):
     aa = (GLubyte  * 3)(0)
     # Find the color of the pixel we clicked on
     pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
-    game.world.hoverItem = None
+    cid = Color(aa[0], aa[1], aa[2]).toID()
 
-    # for e, meshs in game.world.entity_manager.pairsForType(MeshComponent):
-    #     for mesh in meshs:
-    #         if mesh.cid == Color(aa[0], aa[1], aa[2]).toID():
-    #             print("Found it!")
+
+    try:
+        mesh = game.world.entity_manager.cidDatabase[cid]
+        if game.world.hoverItem != mesh.owner and game.world.hoverItem is not None:
+            for hoverable in game.world.entity_manager.componentByType(game.world.hoverItem, MouseHoverComponent):
+                hoverable.active = False
+        for hoverable in game.world.entity_manager.componentByType(mesh.owner, MouseHoverComponent):
+            hoverable.active = True
+        print("Hovering over object at", x, y)
+        game.world.hoverItem = mesh.owner
+    except KeyError:
+        if game.world.hoverItem is not None:
+            for hoverable in game.world.entity_manager.componentByType(game.world.hoverItem, MouseHoverComponent):
+                hoverable.active = False
+        game.world.hoverItem = None
 
 
 
