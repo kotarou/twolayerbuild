@@ -9,11 +9,11 @@ from pyglet.gl import *
 
 import ctypes
 
-from ecs.models import Component, System, Entity
-from ecs.managers import EntityManager, SystemManager
-from ecs.exceptions import NonexistentComponentTypeForEntity
+#from ecs.models import Component, System, Entity
+#from ecs.managers import EntityManager, SystemManager
+#from ecs.exceptions import NonexistentComponentTypeForEntity
 
-class Element(Entity):
+class Entity(object):
     """ 
         An object
     """
@@ -21,7 +21,10 @@ class Element(Entity):
         self.eman = eman
         self.color = color
         self.components = {}
-        super().__init__(int(color.r*255*255+color.g*255+color.b))
+
+    @property 
+    def cid(self):
+        return int(color.r+color.g*255+color.b*255*255)
 
     def addComponent(self, component):
         self.eman.add_component(self, component) 
