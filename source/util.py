@@ -3,11 +3,6 @@
 @author: Kotarou
 """
 from color import *
-import time
-
-class Util:
-    def time(): 
-        return int(round(time.time() * 1000))
 
 class Shape(object):
     def __init__(self, color=None, texture=None):
@@ -26,9 +21,9 @@ class Shape(object):
 class Square(Shape):
 
     def __init__(self, center, side, color=None, texture=None):
-        self.vertexList = [	[center[0]-side/2, center[1]-side/2, center[2]],  
-                            [center[0]-side/2, (center[1]+side/2), center[2]],   
-                            [(center[0]+side/2), (center[1]+side/2), center[2]], 
+        self.vertexList = [	[center[0]-side/2, center[1]-side/2, center[2]],
+                            [center[0]-side/2, (center[1]+side/2), center[2]],
+                            [(center[0]+side/2), (center[1]+side/2), center[2]],
                             [(center[0]+side/2), center[1]-side/2, center[2]]]
         self.indexList 	= [[0,1,2], [2,3,0]]
         self.textureMap = [[0,0], [0, 1], [1,1], [1, 0]]
@@ -38,9 +33,9 @@ class Square(Shape):
 class Triangle(Shape):
 
     def __init__(self, center, side, color=None, texture=None):
-        self.vertexList = [	[center[0]-side/2, center[1]-side/2, center[2]],  
-                            [center[0]-side/2, (center[1]+side/2), center[2]],   
+        self.vertexList = [	[center[0]-side/2, center[1]-side/2, center[2]],
+                            [center[0]-side/2, (center[1]+side/2), center[2]],
                             [(center[0]+side/2), (center[1]+side/2), center[2]]]
         self.indexList 	= [[0,1,2]]
         self.textureMap = [[0,0], [0, 1], [1,1]]
-        super().__init__(color, texture)   
+        super().__init__(color, texture)

@@ -3,7 +3,7 @@
 @author: Kotarou
 """
 
-from ecs.models import System
+from entity import System
 from components.MeshComponent import MeshComponent
 from pyglet.gl import *
 
@@ -12,12 +12,16 @@ class PickSystem(System):
     def __init__(self):
         super().__init__()
 
-    def update (self, _): 
-        for e, mesh in self.entity_manager.pairs_for_type(MeshComponent):
-            self.fboDraw(e.color, mesh)
+    def update (self, _):
+        try:
+            for e, mesh in self.eman.pairsForType(MeshComponent):
+                #self.fboDraw(e.color, mesh)
+                self.fboDraw(mesh)
+        except TypeError:
+            raise Exception("PickSystem without any MeshComponents")
 
-    def fboDraw(self, color, mesh):
-        r, g, b = color
+    def fboDraw(self, mesh):
+        r, g, b = mesh.color
         glColor3ub(r, g, b)
         glBegin(GL_TRIANGLES)
         for ind in mesh.indexList:

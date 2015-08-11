@@ -11,7 +11,7 @@ from random import uniform
 
 class Color(namedtuple('__BaseColor', 'r g b')):
     """
-    Colors. Add description here. 
+    Colors. Add description here.
     """
 
     CHANNEL_MAX = 255
@@ -47,7 +47,11 @@ class Color(namedtuple('__BaseColor', 'r g b')):
             min(int(self.r*1.1), 255),
             min(int(self.g*1.1), 255),
             min(int(self.b*1.1), 255)
-        )        
+        )
+
+    def toID(self):
+        return self.r+self.g*255+self.b*255*255
+
     def next():
         if Color.uid_r < Color.CHANNEL_MAX:
             Color.uid_r += 1

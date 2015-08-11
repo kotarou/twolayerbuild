@@ -8,6 +8,8 @@ from fbo import *
 from ecs.exceptions import *
 import numpy as np
 
+from managers import *
+
 from entity import *
 from camera import *
 
@@ -25,25 +27,28 @@ from util import *
 
 from systems import *
 from components import *
-
-GAME_TICKS_PER_SECOND 	= 60.0 
+import time
+GAME_TICKS_PER_SECOND 	= 60.0
 PICK_TOLERANCE 			= 3
 PICK_BUFFER_SIZE 		= 256
 # VERTEX_SHADER = shaders.compileShader(
 # 	"""
-# 	#version 120 
-# 	void main() { 
-# 		gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; 
+# 	#version 120
+# 	void main() {
+# 		gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 # 	}
 # 	""", GL_VERTEX_SHADER)
 
 # FRAGMENT_SHADER = shaders.compileShader(
 # 	"""
-# 	#version 120 
-# 	void main() { 
-# 		gl_FragColor = vec4( 0, 1, 0, 1 ); 
+# 	#version 120
+# 	void main() {
+# 		gl_FragColor = vec4( 0, 1, 0, 1 );
 # 	}
 # 	""", GL_FRAGMENT_SHADER)
+
+def currTime():
+    return int(round(time.time() * 1000))
 
 pyglet.resource.path = ['../resources']
 pyglet.resource.reindex()
@@ -92,26 +97,30 @@ class World(object):
         # These components should update every tick
         self.entity_manager = EntityManager()
         self.system_manager = SystemManager(self.entity_manager)
-        self.system_manager.add_system(HealthSystem())
-        self.system_manager.add_system(MouseHoverSystem())
+        self.system_manager.addSystem("component", HealthSystem())
+        #self.system_manager.addSystem("interaction", MouseHoverSystem())
 
-        # The manager for user inputs
-        # These should only input when a user makes an action
-        self.ui_manager = SystemManager(self.entity_manager)
-        self.ui_manager.add_system(KeyHoldSystem())
+        #self.system_manager.addSystem("interaction", KeyHoldSystem())
 
-        # The render manager. Updates to redraw graphics
-        self.render_manager = SystemManager(self.entity_manager)
-        self.render_manager.add_system(RenderSystem()) 
-        
-        # The pick manager. Updates to a seperate framebuffer than render_manager
-        self.pick_manager = SystemManager(self.entity_manager)
-        self.pick_manager.add_system(PickSystem())
+        self.system_manager.addSystem("render", RenderSystem())
+        self.system_manager.addSystem("pick", PickSystem())
+        # # The manager for user inputs
+        # # These should only input when a user makes an action
+        # self.ui_manager = SystemManager(self.entity_manager)
+        # self.ui_manager.add_system(KeyHoldSystem())
+
+        # # The render manager. Updates to redraw graphics
+        # self.render_manager = SystemManager(self.entity_manager)
+        # self.render_manager.add_system(RenderSystem())
+
+        # # The pick manager. Updates to a seperate framebuffer than render_manager
+        # self.pick_manager = SystemManager(self.entity_manager)
+        # self.pick_manager.add_system(PickSystem())
 
         x = tempClass3(Color.next(), self.entity_manager)
         x.addComponent(MeshComponent(
-        vertexList = [ [100, -100, 0],  
-                            [100, 100, 0],   
+        vertexList = [ [100, -100, 0],
+                            [100, 100, 0],
                             [-100, 100, 0]],
         indexList  = [[0,1,2]],
         colored=True,
@@ -145,7 +154,7 @@ for ee, health in e.eman.pairs_for_type(Health):
         ))
         y.addComponent(MouseClickComponent("Stay away!"))
 
-        # Note that higher Z = closer to camera 
+        # Note that higher Z = closer to camera
 
         print(y.getComponents())
 
@@ -155,25 +164,27 @@ for ee, health in e.eman.pairs_for_type(Health):
         #clock.schedule_interval(self.update, 0.25)
 
     def update(self):
-        time = Util.time()
-        self.ui_manager.update(time-self.lastTime)
-        self.system_manager.update(time-self.lastTime)
+        cTime = currTime()
+        #self.ui_manager.update(time-self.lastTime)
+        self.system_manager.update("component",cTime-self.lastTime)
+        #self.system_manager.update("interaction",cTime-self.lastTime)
         self.hover()
-        self.lastTime = time
+        self.lastTime = cTime
 
     def draw(self):
+        cTime = currTime()
         # Render the current frame
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        self.render_manager.update(0.5)
-        
+        self.system_manager.update("render",cTime-self.lastTime)
+
         # # Render the current picking frame
         self.fbo.attach()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity()
-        self.pick_manager.update(0.5)
+        self.system_manager.update("pick",cTime-self.lastTime)
         self.fbo.detach()
 
     def hover(self):
@@ -187,14 +198,14 @@ for ee, health in e.eman.pairs_for_type(Health):
 class Game(object):
 
     def __init__(self):
-        global keys 
+        global keys
         keys = key.KeyStateHandler()
 
         self.world = World()
         self.window = window.Window(800,600, vsync=True)#fullscreen=True, vsync=True)
-        
+
         #self.window.push_handlers(pyglet.window.event.WindowEventLogger())
-        
+
         self.window.push_handlers(keys)
 
         self.camera = TopDownCamera(self.window)
@@ -237,19 +248,29 @@ def on_mouse_press(x, y, button, modifiers):
     # Find the color of the pixel we clicked on
     pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
     print(aa[0], aa[1], aa[2])
-    
-    # Find the entity with the corresponding color
-    for e, mesh in game.world.entity_manager.pairs_for_type(MeshComponent):
-        if e.color == Color(aa[0], aa[1], aa[2]):
-            try:
-                # TODO move logic into a click system
-                game.world.entity_manager.component_for_entity(e, MouseClickComponent).onClick(e, x, y)
-            except NonexistentComponentTypeForEntity:
-                pass
+    cid = Color(aa[0], aa[1], aa[2]).toID()
+
+    try:
+        mesh = game.world.entity_manager.cidDatabase[cid]
+        print(game.world.entity_manager.componentByType(mesh.owner, MouseClickComponent))
+        for clickable in game.world.entity_manager.componentByType(mesh.owner, MouseClickComponent):
+            for c in clickable:
+                print(c)
+                c.onClick(mesh.owner, x, y)
+    except KeyError:
+        pass
+
+
+        # if e.color == Color(aa[0], aa[1], aa[2]):
+        #     try:
+        #         # TODO move logic into a click system
+        #         game.world.entity_manager.component_for_entity(e, MouseClickComponent).onClick(e, x, y)
+        #     except NonexistentComponentTypeForEntity:
+        #         pass
     # Release the picking frame buffer
     game.world.fbo.detach()
 
-@game.window.event                       
+@game.window.event
 def on_mouse_motion(x, y, dx, dy):
     # Swap the the frame buffer where picking colors are drawn
     game.world.fbo.attach()
@@ -258,31 +279,40 @@ def on_mouse_motion(x, y, dx, dy):
     # Find the color of the pixel we clicked on
     pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
     game.world.hoverItem = None
-    
-    # Slow, but handles mousing off something
-    for e, h in game.world.entity_manager.pairs_for_type(MouseHoverComponent):
-        h.active = False
+
+    # for e, meshs in game.world.entity_manager.pairsForType(MeshComponent):
+    #     for mesh in meshs:
+    #         if mesh.cid == Color(aa[0], aa[1], aa[2]).toID():
+    #             print("Found it!")
+
+
+
+    # # Slow, but handles mousing off something
+    # for e, h in game.world.entity_manager.pairsForType(MouseHoverComponent):
+    #     h.active = False
 
     # TODO add something for caching the previously hovered item.
 
-    # TODO construct map of color_id <=> object, find object from id. 
+    # TODO construct map of color_id <=> object, find object from id.
     #   Update such a map whenever I add a new meshcomponent.
     #   Basically, build something off ECS instead of simply using ECS at this point.
 
     # Find the entity with the corresponding color
-    for e, mesh in game.world.entity_manager.pairs_for_type(MeshComponent):
-        if e.color == Color(aa[0], aa[1], aa[2]):
-            try:
-                h = game.world.entity_manager.component_for_entity(e, MouseHoverComponent)
-                h.active = True
-                if game.world.hoverItem != e:
-                    game.world.hoverSwap = True
-                    game.world.hoverItem = e
-                else:
-                    game.world.hoverSwap = False
-                break
-            except NonexistentComponentTypeForEntity:
-                game.world.hoverItem = None
+
+
+    # for e, mesh in game.world.entity_manager.pairsForType(MeshComponent):
+    #     if e.color == Color(aa[0], aa[1], aa[2]):
+    #         try:
+    #             h = game.world.entity_manager.component_for_entity(e, MouseHoverComponent)
+    #             h.active = True
+    #             if game.world.hoverItem != e:
+    #                 game.world.hoverSwap = True
+    #                 game.world.hoverItem = e
+    #             else:
+    #                 game.world.hoverSwap = False
+    #             break
+    #         except NonexistentComponentTypeForEntity:
+    #             game.world.hoverItem = None
 
     # Release the picking frame buffer
     game.world.fbo.detach()

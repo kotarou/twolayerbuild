@@ -2,7 +2,7 @@
 """
 @author: Kotarou
 """
-from ecs.models import Component
+from entity import Component
 from pyglet.window import key
 from .KeyComponent import *
 
@@ -15,8 +15,9 @@ class KeyPressComponent(KeyComponent):
     #     self.active = False
 
     def __init__(self, actions):
-    	self.actions = actions
+        super().__init__()
+        self.actions = actions
 
     def respond(self, input):
-    	self.parse(self.actions[input])
-    	#print(self.response)
+        self.parse(self.actions[input])
+        #print(self.response)

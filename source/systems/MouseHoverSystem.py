@@ -3,7 +3,7 @@
 @author: Kotarou
 """
 
-from ecs.models import System
+from entity import System
 from components.MouseHoverComponent import MouseHoverComponent
 
 class MouseHoverSystem(System):
@@ -11,11 +11,15 @@ class MouseHoverSystem(System):
     def __init__(self):
         super().__init__()
 
-    def update (self, dt): 
-        for e, hover in self.entity_manager.pairs_for_type (MouseHoverComponent):
-            if hover.active:
-            	print(hover.response)
-            	hover.hoverTime += dt
-            	print(hover.hoverTime)
-            else:
-            	hover.hoverTime = 0
+    def update (self, dt):
+        try:
+            for e, hovers in self.eman.pairsForType(MouseHoverComponent):
+                for hover in hovers:
+                    if hover.active:
+                        print(hover.response)
+                        hover.hoverTime += dt
+                        print(hover.hoverTime)
+                    else:
+                        hover.hoverTime = 0
+        except TypeError:
+            raise Exception("Mouse Hover System invoked without any mouse hover components")

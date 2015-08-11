@@ -3,7 +3,7 @@
 @author: Kotarou
 """
 
-from ecs.models import System
+from entity import System
 from components.MeshComponent import MeshComponent
 from pyglet.gl import *
 
@@ -12,8 +12,8 @@ class RenderSystem(System):
     def __init__(self):
         super().__init__()
 
-    def update (self, _): 
-        for e, mesh in self.entity_manager.pairs_for_type(MeshComponent):
+    def update (self, _):
+        for e, mesh in self.eman.pairsForType(MeshComponent):
             if mesh.textured:
                 self.texRender(mesh)
             else:

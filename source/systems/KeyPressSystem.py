@@ -3,7 +3,7 @@
 @author: Kotarou
 """
 
-from ecs.models import System
+from entity import System
 from components.KeyPressComponent import KeyPressComponent
 
 class KeyPressSystem(System):
@@ -11,12 +11,12 @@ class KeyPressSystem(System):
     def __init__(self):
         super().__init__()
 
-    def update (self, dt): 
-        pass
-        # for e, hover in self.entity_manager.pairs_for_type (MouseHoverComponent):
-        #     if hover.active:
-        #     	print(hover.response)
-        #     	hover.hoverTime += dt
-        #     	print(hover.hoverTime)
-        #     else:
-        #     	hover.hoverTime = 0
+    def update (self, dt):
+        for e, hovers in self.eman.pairsforType(MouseHoverComponent):
+            for hover in hovers:
+                if hover.active:
+                    print(hover.response)
+                    hover.hoverTime += dt
+                    print(hover.hoverTime)
+                else:
+                    hover.hoverTime = 0
