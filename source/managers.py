@@ -117,10 +117,25 @@ class EntityManager(object):
 
     def componentByType(self,entity, cType):
         """
+            Compatibility with older code. Will refactor out eventually.
+        """
+        return self.componentsByType(entity, cType)
+
+    def componentsByType(self,entity, cType):
+        """
             Return all components of type cType belongning to entity
         """
         try:
             return [k for (j,k) in self._dbCID.items() if type(k) == cType and k.owner == entity]
+        except KeyError:
+            return None
+
+    def singleComponentByType(self,entity, cType):
+        """
+            Return the first / only component of type cType belongning to entity
+        """
+        try:
+            return [k for (j,k) in self._dbCID.items() if type(k) == cType and k.owner == entity][0]
         except KeyError:
             return None
 

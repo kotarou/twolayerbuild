@@ -141,15 +141,24 @@ print("hi!!!")
         y.addComponent(MouseClickComponent("Stay away!"))
 
         y.addComponent(KeyHoldComponent({Key(key.W, 0): ["""
-from util import Vector
-from components import *
-owner.eman.componentByType(owner, SVAComponent)[0].V = Vector(1,0,0)
-
-""", """
-from util import Vector
-from components import *
-owner.eman.componentByType(owner, SVAComponent)[0].V = Vector(0,0,0)
-
+owner.getSingleComponentByType(SVAComponent).S += Vector(0,1,0)
+"""]}))
+        y.addComponent(KeyHoldComponent({Key(key.Q, 0): [
+"""
+owner.getSingleComponentByType(SVAComponent).V = Vector(0,1,0)
+""",
+"""
+owner.getSingleComponentByType(SVAComponent).V = Vector(0,0,0)
+"""
+]}))
+        y.addComponent(KeyHoldComponent({Key(key.S, 0): ["""
+owner.getSingleComponentByType(SVAComponent).S += Vector(0,-1,0)
+"""]}))
+        y.addComponent(KeyHoldComponent({Key(key.A, 0): ["""
+owner.getSingleComponentByType(SVAComponent).S += Vector(-1,0,0)
+"""]}))
+        y.addComponent(KeyHoldComponent({Key(key.D, 0): ["""
+owner.getSingleComponentByType(SVAComponent).S += Vector(1,0,0)
 """]}))
         # Note that higher Z = closer to camera
 
@@ -255,6 +264,19 @@ class Game(object):
             self.window.flip()
 game = Game()
 
+def cidFromMouse(x, y):
+    # Swap the the frame buffer where picking colors are drawn
+    game.world.fbo.attach()
+    # Set up storage for the pixel we click on
+    aa = (GLubyte  * 3)(0)
+    # Find the color of the pixel we clicked on
+    pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
+
+    # Release the picking frame buffer
+    game.world.fbo.detach()
+    # Generate the id of the color we cllicked on
+    return  Color(aa[0], aa[1], aa[2]).toID()
+
 @game.window.event
 def on_mouse_press(x, y, button, modifiers):
     """
@@ -263,16 +285,7 @@ def on_mouse_press(x, y, button, modifiers):
         button		:	(int)	The mouse button that was pressed. 1 = left click, 4 = right click
         modifiers	:	(int)	Modifying keys that were pressed in conjunction with the mouse
     """
-
-    # Swap the the frame buffer where picking colors are drawn
-    game.world.fbo.attach()
-    # Set up storage for the pixel we click on
-    aa = (GLubyte  * 3)(0)
-    # Find the color of the pixel we clicked on
-    pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
-
-    # Generate the id of the color we cllicked on
-    cid = Color(aa[0], aa[1], aa[2]).toID()
+    cid = cidFromMouse(x, y)
 
     # Search for the mesh with id in the database of color ids
     # If we find it, run the on Click event for each MouseClickComponent attached to the owner of the mesh we clicked on
@@ -282,9 +295,6 @@ def on_mouse_press(x, y, button, modifiers):
             clickable.onClick(mesh.owner, x, y)
     except KeyError:
         pass
-
-    # Release the picking frame buffer
-    game.world.fbo.detach()
 
 @game.window.event
 def on_mouse_motion(x, y, dx, dy):

@@ -7,6 +7,8 @@ from entity import Component
 from pyglet.window import key
 from collections import namedtuple
 from .HealthComponent import Health
+from .SVAComponent import SVAComponent
+from util import Vector
 
 class Key(namedtuple('__KeyCombination', 'symbol modifiers modMatters')):
     """
@@ -53,7 +55,12 @@ class KeyComponent(Component):
 
     def parse(self, input):
         x = self.owner
-        exec(input, globals(), {"owner":x})
+        d = globals()
+        d["eman"] = x.eman
+        d["owner"] = x
+        d["SVAComponent"] = SVAComponent
+        d["Vector"] = Vector
+        exec(input, globals(), d)
 
 
 if __name__ == "__main__":

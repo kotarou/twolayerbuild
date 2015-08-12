@@ -5,8 +5,7 @@
 
 from entity import System
 from pyglet.window import key
-from components.KeyHoldComponent import KeyHoldComponent
-# from components.KeyPressComponent import KeyPressComponent
+from components import KeyHoldComponent
 
 class KeyHoldSystem(System):
 
@@ -20,6 +19,7 @@ class KeyHoldSystem(System):
                     if k in holder.active:
                         holder.parse(a[0])
                     else:
-                        holder.parse(a[1])
+                        if len(a) > 1:
+                            holder.parse(a[1])
         except TypeError:
             raise Exception("KeyholdSystem without any KeyHoldComponents")

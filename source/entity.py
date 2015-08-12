@@ -41,12 +41,11 @@ class Entity(object):
             raise Exception("Components cannot have a component added to them")
         self.eman.addComponent(self, component)
 
-    def getComponents(self):
-        if self._isComponent:
-            return {}
-        else:
-            # Currently unimplemented
-            return {}
+    def getComponentsByType(self, cType):
+        return self.eman.componentsByType(self, cType)
+
+    def getSingleComponentByType(self, cType):
+        return self.eman.singleComponentByType(self, cType)
 
 class System(object):
     """
