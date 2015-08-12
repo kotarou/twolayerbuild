@@ -84,6 +84,8 @@ class World(object):
         self.hoverItem = None
         self.hoverSwap = False
         self.lastTime = 0
+        self.mousePosition = (0,0)
+        self.mouseMovement = (0,0)
         # load the example texture
         tile_file = pyglet.image.load('resources/floor_tiles.png')
         sections = []
@@ -188,8 +190,9 @@ print("hi!!!")
 
         # If the mouse has not moved, we still need to update hover code
         # TODO: Add check for mouse having not moved
-        self.mouseHandle(mouseX, mouseY, 0, 0)
-
+        self.mouseHandle(self.mousePosition[0], self.mousePosition[1],
+                         self.mouseMovement[0], self.mouseMovement[1])
+        self.mouseMovement = (0,0)
         self.lastTime = cTime
 
     def draw(self):
@@ -215,10 +218,6 @@ class Game(object):
 
     def __init__(self):
         global keys
-        global mouseX
-        global mouseY
-        mouseX = 0
-        mouseY = 0
         keys = key.KeyStateHandler()
 
         self.world = World()
@@ -289,10 +288,8 @@ def on_mouse_motion(x, y, dx, dy):
         x, y        :   (int)   The coordinates of the mouse location in screen-space
         dx, dy      :   (int)   The change in mouse position
     """
-    global mouseX
-    mouseX = x
-    global mouseY
-    mouseY = y
+    game.world.mousePosition = (x, y)
+    game.world.mouseMovement = (dx, dy)
 
 
 @game.window.event
