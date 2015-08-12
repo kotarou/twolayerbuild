@@ -18,6 +18,8 @@ class KeyHoldSystem(System):
             for e, holder in self.eman.pairsForType(KeyHoldComponent):
                 for k, a in holder.actions.items():
                     if k in holder.active:
-                        holder.parse(a)
+                        holder.parse(a[0])
+                    else:
+                        holder.parse(a[1])
         except TypeError:
             raise Exception("KeyholdSystem without any KeyHoldComponents")

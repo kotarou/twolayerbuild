@@ -52,7 +52,8 @@ class KeyComponent(Component):
         super().__init__()
 
     def parse(self, input):
-        exec(input, locals(), locals())
+        x = self.owner
+        exec(input, globals(), {"owner":x})
 
 
 if __name__ == "__main__":

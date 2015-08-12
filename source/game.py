@@ -131,21 +131,28 @@ print("hi!!!")
             Key(key.Q, key.MOD_SHIFT, True): 'print("Yo!")'
             }))
         #x.addComponent(KeyHoldComponent(Key(key.B, 0), "grrrr!"))
-        x.addComponent(KeyHoldComponent({
-            Key(key.W, 0): parseString,
-            Key(key.S, key.MOD_SHIFT, True): 'print("sssssssssssssssssss")'
-            }))
         x.addComponent(Health(10))
 
         y = tempClass3(Color.next(), self.entity_manager)
+        y.addComponent(SVAComponent(Vector(-100,-100,0)))
         y.addComponent(MeshComponent(
         Square((50,50,100), 20, Color.White, textures[2])
         ))
         y.addComponent(MouseClickComponent("Stay away!"))
 
+        y.addComponent(KeyHoldComponent({Key(key.W, 0): ["""
+from util import Vector
+from components import *
+owner.eman.componentByType(owner, SVAComponent)[0].V = Vector(1,0,0)
+
+""", """
+from util import Vector
+from components import *
+owner.eman.componentByType(owner, SVAComponent)[0].V = Vector(0,0,0)
+
+"""]}))
         # Note that higher Z = closer to camera
 
-        print(y.getComponents())
 
         # Can explicitly call functions on a timer
         # Only methods called from here need a dt
