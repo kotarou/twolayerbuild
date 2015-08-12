@@ -120,7 +120,7 @@ class World(object):
         parseString = """
 print("hi!!!")
         """
-        x.addComponent(SVAComponent(Vector(-100,-100,0),Vector(1,1,0)))
+        x.addComponent(SVAComponent(Vector(-100,-100,0),Vector(0.5,0.5,0),a_velocity=Vector(0,0,1)))
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
         x.addComponent(MouseHoverComponent("Hovered!"))
         #x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
@@ -150,11 +150,46 @@ print("hi!!!")
         # Methods called from mainLoop don't
         #clock.schedule_interval(self.update, 0.25)
 
+    def mouseHandle(self, x, y, dx, dy):
+         # Swap the the frame buffer where picking colors are drawn
+        game.world.fbo.attach()
+        # Set up storage for the pixel we click on
+        aa = (GLubyte  * 3)(0)
+        # Find the color of the pixel we clicked on
+        pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
+        cid = Color(aa[0], aa[1], aa[2]).toID()
+
+        try:
+            mesh = game.world.entity_manager.cidDatabase[cid]
+            # If a different object was hovered on, set its hover state to false
+            if game.world.hoverItem != mesh.owner and game.world.hoverItem is not None:
+                for hoverable in game.world.entity_manager.componentByType(game.world.hoverItem, MouseHoverComponent):
+                    hoverable.active = False
+            # Set the hover state of the current object to True
+            for hoverable in game.world.entity_manager.componentByType(mesh.owner, MouseHoverComponent):
+                hoverable.active = True
+            print("Hovering over object at", x, y)
+            game.world.hoverItem = mesh.owner
+        except KeyError:
+            # We are hovering over nothing.
+            if game.world.hoverItem is not None:
+                for hoverable in game.world.entity_manager.componentByType(game.world.hoverItem, MouseHoverComponent):
+                    hoverable.active = False
+            game.world.hoverItem = None
+
+        # Release the picking frame buffer
+        game.world.fbo.detach()
+
     def update(self):
         cTime = currTime()
         #self.ui_manager.update(time-self.lastTime)
         self.system_manager.update("component",cTime-self.lastTime)
         self.system_manager.update("interaction",cTime-self.lastTime)
+
+        # If the mouse has not moved, we still need to update hover code
+        # TODO: Add check for mouse having not moved
+        self.mouseHandle(mouseX, mouseY, 0, 0)
+
         self.lastTime = cTime
 
     def draw(self):
@@ -180,6 +215,10 @@ class Game(object):
 
     def __init__(self):
         global keys
+        global mouseX
+        global mouseY
+        mouseX = 0
+        mouseY = 0
         keys = key.KeyStateHandler()
 
         self.world = World()
@@ -250,34 +289,11 @@ def on_mouse_motion(x, y, dx, dy):
         x, y        :   (int)   The coordinates of the mouse location in screen-space
         dx, dy      :   (int)   The change in mouse position
     """
-    # Swap the the frame buffer where picking colors are drawn
-    game.world.fbo.attach()
-    # Set up storage for the pixel we click on
-    aa = (GLubyte  * 3)(0)
-    # Find the color of the pixel we clicked on
-    pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
-    cid = Color(aa[0], aa[1], aa[2]).toID()
+    global mouseX
+    mouseX = x
+    global mouseY
+    mouseY = y
 
-    try:
-        mesh = game.world.entity_manager.cidDatabase[cid]
-        # If a different object was hovered on, set its hover state to false
-        if game.world.hoverItem != mesh.owner and game.world.hoverItem is not None:
-            for hoverable in game.world.entity_manager.componentByType(game.world.hoverItem, MouseHoverComponent):
-                hoverable.active = False
-        # Set the hover state of the current object to True
-        for hoverable in game.world.entity_manager.componentByType(mesh.owner, MouseHoverComponent):
-            hoverable.active = True
-        print("Hovering over object at", x, y)
-        game.world.hoverItem = mesh.owner
-    except KeyError:
-        # We are hovering over nothing.
-        if game.world.hoverItem is not None:
-            for hoverable in game.world.entity_manager.componentByType(game.world.hoverItem, MouseHoverComponent):
-                hoverable.active = False
-        game.world.hoverItem = None
-
-    # Release the picking frame buffer
-    game.world.fbo.detach()
 
 @game.window.event
 def on_key_press(symbol, modifiers):

@@ -9,15 +9,21 @@ from pyglet.window import key
 class SVAComponent(Component):
     __slots__ = "S", "V", "A", "THETA", "OMEGA", "ALPHA", "anchor"
     def __init__(self, position=Vector(0,0,0), velocity=Vector(0,0,0), acceleration=Vector(0,0,0),
-                 a_position=0, a_velocity=0, a_acceleration=0, anchor=Vector(0,0,0)):
+        a_position=Vector(0,0,0), a_velocity=Vector(0,0,0), a_acceleration=Vector(0,0,0)):#, anchor=Vector(0,0,0)):
         super().__init__()
+        # Linear
         self.S = position
         self.V = velocity
         self.A = acceleration
+        # Rotational
+        # Ie, rotation around x axis, y axis, z axis (euler angles)
+        # Very simple, temporary code.
         self.THETA = a_position
+        # theta, phi,
         self.OMEGA = a_velocity
         self.ALPHA = a_acceleration
-        self.anchor = anchor
+
+        #self.anchor = anchor
 
     def respond(self, input):
         self.parse(self.actions[input])

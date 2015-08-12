@@ -13,6 +13,12 @@ class SVASystem(System):
 
     def update (self, _):
         for e, sva in self.eman.pairsForType(SVAComponent):
+            # Linear
             sva.V += sva.A
             sva.S += sva.V
+
+            # Rotational
+            sva.OMEGA += sva.ALPHA
+            sva.THETA += sva.OMEGA
+
             # TODO implement angular shite

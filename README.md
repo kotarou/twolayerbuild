@@ -24,4 +24,7 @@ The game world, by default, is rendered into the region
 
     With the current camera setup, this actually only means that the camera centers onto (0,0) with the window size as the viewport
 
+Possibly confusing, an object may have multiple SVA components.
+This is to allow (eventual) complex behaviours where an objects position may be reliant on multiple in game factors which shouldn't be combined
+
 
