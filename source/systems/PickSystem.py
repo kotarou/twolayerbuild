@@ -5,6 +5,7 @@
 
 from entity import System
 from components.MeshComponent import MeshComponent
+from components import SVAComponent
 from pyglet.gl import *
 
 class PickSystem(System):
@@ -13,6 +14,8 @@ class PickSystem(System):
         super().__init__()
 
     def update (self, _):
+        for e, sva in self.eman.pairsForType(SVAComponent):
+            glTranslatef(sva.S.x,sva.S.y,sva.S.z)
         try:
             for e, mesh in self.eman.pairsForType(MeshComponent):
                 #self.fboDraw(e.color, mesh)

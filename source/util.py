@@ -39,3 +39,27 @@ class Triangle(Shape):
         self.indexList 	= [[0,1,2]]
         self.textureMap = [[0,0], [0, 1], [1,1]]
         super().__init__(color, texture)
+
+class Vector(namedtuple('__Position', 'x y z')):
+    p_x       = 0
+    p_y       = 0
+    p_z       = 0
+
+    def __new__(cls, x, y, z):
+        return super(Vector, cls).__new__(cls, x, y, z)
+
+    def __add__(self, other):
+        x, y, z = self
+        return Vector(x+other.x,y+other.y,z+other.z)
+
+    def __iadd__(self, other):
+        x, y, z = self
+        return Vector(x+other.x,y+other.y,z+other.z)
+
+    #TODO: Interface with numpy
+
+if __name__ == "__main__":
+    p = Vector(1,2,3)
+    r = Vector(1,1,1)
+    p += r
+    print(p)

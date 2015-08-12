@@ -47,26 +47,29 @@ class Entity(object):
         else:
             # Currently unimplemented
             return {}
-        # r = {}
-        # for component in self.eman.database:
-        #     for cls in self.eman.database[component]:
-        #         if cls.color == self.color:
-        #             x = self.eman.database[component][cls]
-        #             r[type(x)] = x
-        # return r
 
 class System(object):
+    """
+        A system controls the tick logic for components in the game
+        For example, an entity with a health component will lose / gain health in two ways
+            1) When the component is directly accessed
+            2) When the health system updates it
+        Interaction logic should not be controlled by a system, unless we move to a update queue.
+    """
 
     def __init__(self):
         # The managers will be added when this system is added to a manager
         self.eman = None
         self.sman = None
 
-    def update (self, _):
+    def update(self, _):
+        """
+            Update method that will be called each tick.
+            A system will be added to a manager with an id that determines when in each tick it updates
+        """
         raise NotImplementedError("System classes must implment update")
 
 class Component(Entity):
-
     def __init__(self):
         self.color = Color.next()
         self.owner = None

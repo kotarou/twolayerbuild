@@ -31,6 +31,8 @@ import time
 GAME_TICKS_PER_SECOND 	= 60.0
 PICK_TOLERANCE 			= 3
 PICK_BUFFER_SIZE 		= 256
+WINDOW_WIDTH            = 800   # soft variable game.window.width
+WINDOW_HEIGHT           = 600   # soft variable game.window.height
 # VERTEX_SHADER = shaders.compileShader(
 # 	"""
 # 	#version 120
@@ -98,6 +100,7 @@ class World(object):
         self.entity_manager = EntityManager()
         self.system_manager = SystemManager(self.entity_manager)
         self.system_manager.addSystem("component", HealthSystem())
+        self.system_manager.addSystem("component", SVASystem())
         self.system_manager.addSystem("interaction", MouseHoverSystem())
 
         self.system_manager.addSystem("interaction", KeyHoldSystem())
@@ -117,6 +120,7 @@ class World(object):
         parseString = """
 print("hi!!!")
         """
+        x.addComponent(SVAComponent(Vector(-100,-100,0),Vector(1,1,0)))
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
         x.addComponent(MouseHoverComponent("Hovered!"))
         #x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
@@ -156,12 +160,15 @@ print("hi!!!")
     def draw(self):
         cTime = currTime()
         # Render the current frame
+        # This frame is rendered in world-space (-game.window.width / 2,-game.window.height / 2)
+        #                                     ->(game.window.width / 2,game.window.height / 2)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         self.system_manager.update("render",cTime-self.lastTime)
 
         # Render the current picking frame
+        # This frame is rendered in screen-space (0,0)->(game.window.width,game.window.height)
         self.fbo.attach()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glMatrixMode(GL_MODELVIEW);
@@ -176,7 +183,7 @@ class Game(object):
         keys = key.KeyStateHandler()
 
         self.world = World()
-        self.window = window.Window(800,600, vsync=True)#fullscreen=True, vsync=True)
+        self.window = window.Window(WINDOW_WIDTH,WINDOW_HEIGHT, vsync=True)#fullscreen=True, vsync=True)
 
         #self.window.push_handlers(pyglet.window.event.WindowEventLogger())
 

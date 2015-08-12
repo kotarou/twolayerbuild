@@ -7,16 +7,18 @@
 from color import *
 
 class EntityManager(object):
-
+    """
+        Manage all entities in the game.
+        For speed of access, three dicts are used to store the entities/components in the game
+    """
     def __init__(self):
-        # The component-sorted database
-        # Component type:
-        #    Entities with a component of that type
-        #        List of components of that type
-        self._dbComponent = {}
-        self._dbEntity = {}
-        self._dbCID = {}
 
+        # [type][owning entity][entity id] -> component
+        self._dbComponent = {}
+        # [owning entity][component id] -> component
+        self._dbEntity = {}
+        # [component id] -> component
+        self._dbCID = {}
 
     @property
     def componentDatabase(self):
@@ -35,7 +37,7 @@ class EntityManager(object):
 
     def addComponent(self, entity, component):
         """
-            When a component is added to the entity, add that component to our database
+            When a component is added to an entity, add that component to our database
         """
         component.owner = entity
 
@@ -59,6 +61,9 @@ class EntityManager(object):
 
 
     def removeComponentByID(self, entity, cid):
+        """
+            Remove component from entity by cid
+        """
         try:
             cType = type(self._dbEntity[entity][cid])
             del self._dbEntity[entity][cid]
@@ -85,13 +90,10 @@ class EntityManager(object):
         except KeyError:
             pass
 
-    def getComponentByEntityID(self, entity, cid):
-    	try:
-    		return self._dbEntity[entity][cid]
-    	except KeyError:
-    		return None
-
     def getComponentByID(self, cid):
+        """
+            Get a component using its ID
+        """
         try:
             return self._dbCID[cid]
         except KeyError:
@@ -108,11 +110,17 @@ class EntityManager(object):
         	return None
 
     def componentsForEntity(self, entity):
+        """
+            Return all components belonging to entity
+        """
         return self._dbEntity[entity].items()
 
-    def componentByType(self,entity, component):
+    def componentByType(self,entity, cType):
+        """
+            Return all components of type cType belongning to entity
+        """
         try:
-            return [k for (j,k) in self._dbCID.items() if type(k) == component and k.owner == entity]
+            return [k for (j,k) in self._dbCID.items() if type(k) == cType and k.owner == entity]
         except KeyError:
             return None
 
@@ -133,25 +141,20 @@ class SystemManager(object):
         sType = type(system)
 
         if manager not in self._dbSystems:
-            #self._dbSystems[manager] = {sType: {}}
             self._dbSystems[manager] = [] # {}
 
-        # if self._dbSystems[manager][sType] is not {}:
-        #     # We are overwriting the previous system of this type
-        #     # Don't
-        #     raise Exception("Adding a duplicate system type to the same manager")
+        # TODO: Logic for duplicate systems
         system.eman = self.eman
         system.sman = self
-        #self._dbSystems[manager][sType] = system
+
         self._dbSystems[manager].append(system)
 
     def update(self, manager, dt):
         """
-            update each system under manager in the order they were added
+            Update each system under manager in the order they were added
         """
         for system in self._dbSystems[manager]:
             system.update(dt)
-
 
 
 
