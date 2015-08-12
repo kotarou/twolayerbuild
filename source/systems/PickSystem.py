@@ -14,22 +14,17 @@ class PickSystem(System):
         super().__init__()
 
     def update (self, _):
-        for e, sva in self.eman.pairsForType(SVAComponent):
-            glTranslatef(sva.S.x,sva.S.y,sva.S.z)
-            glRotatef(sva.THETA.x,1,0,0)
-            glRotatef(sva.THETA.y,0,1,0)
-            glRotatef(sva.THETA.z,0,0,1)
         try:
             for e, mesh in self.eman.pairsForType(MeshComponent):
-                #self.fboDraw(e.color, mesh)
+                glLoadIdentity()
+                for sva in self.eman.componentByType(e, SVAComponent):
+                    glTranslatef(sva.S.x,sva.S.y,sva.S.z)
+                    glRotatef(sva.THETA.x,1,0,0)
+                    glRotatef(sva.THETA.y,0,1,0)
+                    glRotatef(sva.THETA.z,0,0,1)
                 self.fboDraw(mesh)
         except TypeError:
             raise Exception("PickSystem without any MeshComponents")
-        for e, sva in self.eman.pairsForType(SVAComponent):
-            glTranslatef(-sva.S.x,-sva.S.y,-sva.S.z)
-            glRotatef(-sva.THETA.x,1,0,0)
-            glRotatef(-sva.THETA.y,0,1,0)
-            glRotatef(-sva.THETA.z,0,0,1)
 
     def fboDraw(self, mesh):
         r, g, b = mesh.color

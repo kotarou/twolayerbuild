@@ -122,7 +122,7 @@ class World(object):
         parseString = """
 print("hi!!!")
         """
-        x.addComponent(SVAComponent(Vector(-100,-100,0),Vector(0.5,0.5,0),a_velocity=Vector(0,0,1)))
+        x.addComponent(SVAComponent(Vector(-100,-100,0),a_velocity=Vector(0,0,1)))
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
         x.addComponent(MouseHoverComponent("Hovered!"))
         #x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
@@ -202,7 +202,6 @@ print("hi!!!")
         #                                     ->(game.window.width / 2,game.window.height / 2)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
         self.system_manager.update("render",cTime-self.lastTime)
 
         # Render the current picking frame
@@ -210,7 +209,6 @@ print("hi!!!")
         self.fbo.attach()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity()
         self.system_manager.update("pick",cTime-self.lastTime)
         self.fbo.detach()
 

@@ -14,21 +14,19 @@ class RenderSystem(System):
         super().__init__()
 
     def update (self, _):
-        for e, sva in self.eman.pairsForType(SVAComponent):
-            glTranslatef(sva.S.x,sva.S.y,sva.S.z)
-            glRotatef(sva.THETA.x,1,0,0)
-            glRotatef(sva.THETA.y,0,1,0)
-            glRotatef(sva.THETA.z,0,0,1)
+        glLoadIdentity()
         for e, mesh in self.eman.pairsForType(MeshComponent):
+            glLoadIdentity()
+            for sva in self.eman.componentByType(e, SVAComponent):
+                glTranslatef(sva.S.x,sva.S.y,sva.S.z)
+                glRotatef(sva.THETA.x,1,0,0)
+                glRotatef(sva.THETA.y,0,1,0)
+                glRotatef(sva.THETA.z,0,0,1)
             if mesh.textured:
                 self.texRender(mesh)
             else:
                 self.colorRender(mesh)
-        for e, sva in self.eman.pairsForType(SVAComponent):
-            glTranslatef(-sva.S.x,-sva.S.y,-sva.S.z)
-            glRotatef(-sva.THETA.x,1,0,0)
-            glRotatef(-sva.THETA.y,0,1,0)
-            glRotatef(-sva.THETA.z,0,0,1)
+
 
 
     def texRender(self, mesh):
