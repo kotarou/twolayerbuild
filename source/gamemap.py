@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+@author: Till
+"""
+
+
 import pyglet, tile, os
 # lets assume we are calling from the source dir
 mapname = os.path.join('resources','map.dat')
@@ -42,6 +48,9 @@ class Map:
         set_adjacent(self, i,ii)
 
     # set tiles to rooms
+    for room in basicrooms:
+      pass
+
 
 
   # set all the adjacencys up
