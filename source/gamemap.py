@@ -39,9 +39,13 @@ class Map:
     # precompute adjacent tiles
     for i in xrange(0, mapy):
       for ii in xrange(0, mapx):
-        gamemap[ii][i].setadj()
+        set_adjacent(self, i,ii)
 
     # set tiles to rooms
+
+
+  # set all the adjacencys up
+  def set_adjacent(self,i,ii):
 
 
   # Load a map from file

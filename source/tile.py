@@ -1,27 +1,30 @@
 
 class Tile:
 
-  texture = 0
-  above = None
-  left = None
-  right = None
-  below = None
-  # diagonally adjacent
-  adjacentdiag = []
-
-  #vertically or horizontally adjacent
-  adjacentxy = []
-
-  navigatable = True
-  rooms = []
-  contents = []
-
   def __init__(self, symbol, x, y):
 
     self.x = x
     self.y = y
 
+    self.texture = 0
+
+    self.above = None
+    self.left = None
+    self.right = None
+    self.below = None
+
+    # diagonally adjacent
+    self.adjacentdiag = []
+
+    #vertically or horizontally adjacent
+    self.adjacentxy = []
+
+    self.navigatable = True
+    self.rooms = []
+    self.contents = []
+
     # set its texture based on character in map
+    # also if it is navigatable
     if symbol == "#:
       pass
 
@@ -36,10 +39,6 @@ class Tile:
 
     else:
       print("oopsy " + symbol)
-
-  def build_adjacentcy(self):
-      pass
-
 
   def is_adjacent_room(self, room):
       pass
