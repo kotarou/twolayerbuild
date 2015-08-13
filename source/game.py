@@ -111,13 +111,19 @@ class World(object):
         self.system_manager.addSystem("pick", PickSystem())
 
         x = tempClass3(Color.next(), self.entity_manager)
+        # x.addComponent(MeshComponent(
+        # vertexList = [ [100, -100, 0],
+        #                     [100, 100, 0],
+        #                     [-100, 100, 0]],
+        # indexList  = [[0,1,2]],
+        # colored=True,
+        # colorList=Color.Red
+        # ))
         x.addComponent(MeshComponent(
-        vertexList = [ [100, -100, 0],
-                            [100, 100, 0],
-                            [-100, 100, 0]],
-        indexList  = [[0,1,2]],
-        colored=True,
-        colorList=Color.Red
+        GL_TRIANGLES,
+            ('v3f', (0,0,0, 50,0,0, 50,50,0, 0,50,0)),
+            index=[0, 1, 2, 0, 2, 3],
+            color=('c3B', (0,0,255, 0,255,0, 255,0,0, 128,128,128))
         ))
         parseString = """
 print("hi!!!")
@@ -135,9 +141,14 @@ print("hi!!!")
 
         y = tempClass3(Color.next(), self.entity_manager)
         y.addComponent(SVAComponent(Vector(-100,-100,0)))
-        y.addComponent(MeshComponent(
-        Square((50,50,100), 20, Color.White, textures[2])
-        ))
+        y.addComponent((MeshComponent(
+        GL_TRIANGLES,
+            ('v3f', (0,0,0, 50,0,0, 50,50,0, 0,50,0)),
+            index=[0, 1, 2, 0, 2, 3],
+            textureList=('t2i', (0,0, 0,1, 1,1, 1,0)),
+            texture = textures[2],
+
+        )))
         y.addComponent(MouseClickComponent("Stay away!"))
 
         y.addComponent(KeyHoldComponent({Key(key.W, 0): ["""
@@ -167,6 +178,7 @@ owner.getSingleComponentByType(SVAComponent).S += Vector(1,0,0)
         # Only methods called from here need a dt
         # Methods called from mainLoop don't
         #clock.schedule_interval(self.update, 0.25)
+
 
     def mouseHandle(self, x, y, dx, dy):
          # Swap the the frame buffer where picking colors are drawn
@@ -219,6 +231,23 @@ owner.getSingleComponentByType(SVAComponent).S += Vector(1,0,0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glMatrixMode(GL_MODELVIEW)
         self.system_manager.update("render",cTime-self.lastTime)
+        glLoadIdentity()
+        # pyglet.graphics.draw_indexed(4, pyglet.gl.GL_TRIANGLES,
+        #     [0, 1, 2, 0, 2, 3],
+        #     ('v3f', (100, 100, 0,
+        #              150, 100, 0,
+        #              150, 150, 0,
+        #              100, 150, 0)),
+        #     ('c3B', (0, 0, 255, 0, 255, 0, 255, 0, 0, 128, 128, 128))
+        # )
+        # vertex_list = pyglet.graphics.vertex_list(2,
+        #     ('v3i', (10, 15, 200, 30, 35, 200)),
+        #     ('c3B', (0, 0, 255, 0, 255, 0))
+        # )
+        # vertex_list.draw(pyglet.gl.GL_POINTS)
+
+
+
 
         # Render the current picking frame
         # This frame is rendered in screen-space (0,0)->(game.window.width,game.window.height)

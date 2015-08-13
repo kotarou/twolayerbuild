@@ -40,7 +40,7 @@ class Triangle(Shape):
         self.textureMap = [[0,0], [0, 1], [1,1]]
         super().__init__(color, texture)
 
-class Vector(namedtuple('__Position', 'x y z')):
+class Vector(namedtuple('__Vector', 'x y z')):
     p_x       = 0
     p_y       = 0
     p_z       = 0
