@@ -10,16 +10,6 @@ mapname = os.path.join('resources','map.dat')
 
 class Map:
 
-  # 2d list of tiles
-  gamemap = []
-
-  # total x tiles
-  mapx = 0
-
-  # total y tiles
-  mapy = 0
-
-
   # basically test code atm
   def __init__(self):
     # First we load the map
@@ -27,35 +17,52 @@ class Map:
     mappath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapname)
     datas = self.load(mappath)
 
+    # 2d list of tiles
+    self.gamemap = []
+
     # initialise local values
-    mapx = datas[0][0]
-    mapy = datas[0][1]
+    self.mapx = datas[0][0]
+    self.mapy = datas[0][1]
 
     # rudementry map
-    basicmap = datas[1]
+    self.basicmap = datas[1]
 
     # rudementry rooms
-    basicrooms = datas[2]
+    self.basicrooms = datas[2]
 
     # build the map as a 2d list of tiles
     for i in xrange(0, mapy):
       for ii in xrange(0, mapx):
-        gamemap[ii][i] = Tile(basicmap[ii][i],ii,i)
+        self.gamemap[ii][i] = Tile(self.basicmap[ii][i],ii,i)
 
     # precompute adjacent tiles
     for i in xrange(0, mapy):
       for ii in xrange(0, mapx):
-        set_adjacent(self, i,ii)
+        self.set_adjacent(self, i,ii)
 
     # set tiles to rooms
-    for room in basicrooms:
+    for room in self.basicrooms:
       pass
 
 
 
   # set all the adjacencys up
-  def set_adjacent(self,i,ii):
+  def set_adjacent(self, i, ii):
 
+    # first the regular directions
+    if i != 0:
+      self.gamemap[ii][i].above = self.gamemap[ii][i-1]
+
+    if ii != 0:
+      self.gamemap[ii][i].left = self.gamemap[ii-1][i]
+
+    if i != mapy:
+      self.gamemap[ii][i].below = self.gamemap[ii][i+1]
+
+    if ii != mapx:
+      self.gamemap[ii][i].right = self.gamemap[ii+1][i]
+
+    # now a bunch of diagonals
 
   # Load a map from file
   def load(self, filepath):
