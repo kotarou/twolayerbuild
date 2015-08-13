@@ -46,13 +46,10 @@ class Tile:
   def is_diag_adjacent_room(self, room):
       pass
 
-  def add_content(self, identifier):
+  def add_content(self, content):
       pass
 
   def remove_content(self, identifier):
-      pass
-
-  def get_contents(self):
       pass
 
   def contains(self, identifier):
