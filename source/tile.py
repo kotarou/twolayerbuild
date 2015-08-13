@@ -1,31 +1,60 @@
-from abc import ABCMeta, abstractmethod
-import pyglet
-
 
 class Tile:
 
-    __metaclass__ = ABCMeta
+  texture = 0
+  above = None
+  left = None
+  right = None
+  below = None
+  # diagonally adjacent
+  adjacentdiag = []
 
-    name = ""
-    description = ""
-    identifier = ""
+  #vertically or horizontally adjacent
+  adjacentxy = []
 
-    navigatable = ""
-    draw = ""
-    owner = ""
+  navigatable = True
+  rooms = []
+  contents = []
 
-    # refers to index in list, should eventually be a dict and by name
-    texture = 0
+  def __init__(self, symbol, x, y):
 
-    pos = ([0.0, 0.0])
+    self.x = x
+    self.y = y
 
-    def __init__(self, identifier, owner, inX, inY):
-        self.identifier = identifier
-        self.pos[0] = inX
-        self.pos[1] = inY
-        self.owner = owner
+    # set its texture based on character in map
+    if symbol == "#:
+      pass
 
-    # TODO: is called when an entity moves onto this tile?
-    #	When some other things calls its trigger?
-    @abstractmethod
-    def trigger(self): pass
+    elif symbol == "*":
+      pass
+
+    elif symbol == ".":
+      pass
+
+    elif symbol == "@":
+      pass
+
+    else:
+      print("oopsy " + symbol)
+
+  def build_adjacentcy(self):
+      pass
+
+
+  def is_adjacent_room(self, room):
+      pass
+
+  def is_diag_adjacent_room(self, room):
+      pass
+
+  def add_content(self, identifier):
+      pass
+
+  def remove_content(self, identifier):
+      pass
+
+  def get_contents(self):
+      pass
+
+  def contains(self, identifier):
+      pass

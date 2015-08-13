@@ -4,43 +4,44 @@ mapname = os.path.join('resources','map.dat')
 
 class Map:
 
-  tileDict = {} # a map of the tile classes used in the current map
-  roomDict = {} # a map of the rooms used in the current map -
+  # 2d list of tiles
+  gamemap = []
+
+  # total x tiles
+  mapx = 0
+
+  # total y tiles
+  mapy = 0
+
 
   # basically test code atm
   def __init__(self):
     # First we load the map
     # Config file is in root of the project
     mappath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapname)
-    self.load(mappath)
+    datas = self.load(mappath)
 
+    # initialise local values
+    mapx = datas[0][0]
+    mapy = datas[0][1]
 
-    self.createTileObject((0,True, "."))
-    createRoom(tileDict[0], 0, 0, 0, 5, 5)
-    for rooms in roomDict:
-      for tiles in rooms:
-        print(str(navigatable))
+    # rudementry map
+    basicmap = datas[1]
 
-  # defines the tiles used in the current map
-  # takes tileTypeIn[]:
-  #  [0] is always the tile class reference name - unique
-  #  [n], where 1-n define the tile's properties.
+    # rudementry rooms
+    basicrooms = datas[2]
 
-  def createTileObject(self, tileTypeIn):
-    tileDict[tileTypeIn[0]] = Tile.type(str(tileTypeIn[0]), (), {'navigatable': tileTypeIn[1], 'draw': tileTypeIn[2]})
+    # build the map as a 2d list of tiles
+    for i in xrange(0, mapy):
+      for ii in xrange(0, mapx):
+        gamemap[ii][i] = Tile(basicmap[ii][i],ii,i)
 
-  # creates each of the rooms
-  # adds the room to the roomDict
-  # also modifies the rooms if needed - checking if a tile exists at the coordinates given and if so, replaces it
-  #  Does this by:
-  #  Checking if there is a tile at the said coordinates
-  #  If so, removing the tile's reference from whatever room it is associated with
-  #  Then dereferencing it from the map itself
+    # precompute adjacent tiles
+    for i in xrange(0, mapy):
+      for ii in xrange(0, mapx):
+        gamemap[ii][i].setadj()
 
-  def createRoom(self, tileNameIn, roomNameIn, xStart, yStart, xEnd, yEnd):
-    for i in range(xStart, xEnd):
-      for j in range(yStart, yEnd):
-        roomDict[roomNameIn] += tileDict[tileNameIn].init(roomDict[roomNameIn], i, j)
+    # set tiles to rooms
 
 
   # Load a map from file
