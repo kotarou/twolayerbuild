@@ -5,4 +5,5 @@ from .MouseHoverComponent import MouseHoverComponent
 from .KeyPressComponent import KeyPressComponent
 from .KeyHoldComponent import KeyHoldComponent
 from .SVAComponent import SVAComponent
+from .CollisionComponent import CollisionComponent
 

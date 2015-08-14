@@ -103,6 +103,7 @@ class World(object):
         self.system_manager = SystemManager(self.entity_manager)
         self.system_manager.addSystem("component", HealthSystem())
         self.system_manager.addSystem("component", SVASystem())
+        self.system_manager.addSystem("component", CollisionSystem())
         self.system_manager.addSystem("interaction", MouseHoverSystem())
 
         self.system_manager.addSystem("interaction", KeyHoldSystem())
@@ -128,7 +129,7 @@ class World(object):
         parseString = """
 print("hi!!!")
         """
-        x.addComponent(SVAComponent(Vector(-100,-100,0),a_velocity=Vector(0,0,1)))
+        x.addComponent(SVAComponent(Vector(10,10,0),a_velocity=Vector(0,0,0)))
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
         x.addComponent(MouseHoverComponent("Hovered!"))
         #x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
@@ -138,19 +139,18 @@ print("hi!!!")
             }))
         #x.addComponent(KeyHoldComponent(Key(key.B, 0), "grrrr!"))
         x.addComponent(Health(10))
-
+        x.addComponent(CollisionComponent())
         y = tempClass3(Color.next(), self.entity_manager)
-        y.addComponent(SVAComponent(Vector(-100,-100,0)))
+        y.addComponent(SVAComponent(Vector(100,-100,0)))
         y.addComponent((MeshComponent(
         GL_TRIANGLES,
             ('v3f', (0,0,0, 50,0,0, 50,50,0, 0,50,0)),
             index=[0, 1, 2, 0, 2, 3],
             textureList=('t2i', (0,0, 0,1, 1,1, 1,0)),
             texture = textures[2],
-
         )))
         y.addComponent(MouseClickComponent("Stay away!"))
-
+        y.addComponent(CollisionComponent())
         y.addComponent(KeyHoldComponent({Key(key.W, 0): ["""
 owner.getSingleComponentByType(SVAComponent).S += Vector(0,1,0)
 """]}))
@@ -240,11 +240,11 @@ owner.getSingleComponentByType(SVAComponent).S += Vector(1,0,0)
         #              100, 150, 0)),
         #     ('c3B', (0, 0, 255, 0, 255, 0, 255, 0, 0, 128, 128, 128))
         # )
-        # vertex_list = pyglet.graphics.vertex_list(2,
-        #     ('v3i', (10, 15, 200, 30, 35, 200)),
-        #     ('c3B', (0, 0, 255, 0, 255, 0))
-        # )
-        # vertex_list.draw(pyglet.gl.GL_POINTS)
+        vertex_list = pyglet.graphics.vertex_list(6,
+            ('v3i', (0, 0, 0, 100,0,0, 0, 0, 0, 0,100,0, 0,0,0, 0,0,100)),
+            ('c3B', (255,255,255, 255,0,0, 255,255,255, 0,255,0, 255,255,255, 0,0,255))
+        )
+        vertex_list.draw(pyglet.gl.GL_LINES)
 
 
 

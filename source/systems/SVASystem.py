@@ -5,6 +5,7 @@
 
 from entity import System
 from components.SVAComponent import SVAComponent
+from components.CollisionComponent import CollisionComponent
 
 class SVASystem(System):
 
@@ -22,3 +23,4 @@ class SVASystem(System):
             sva.THETA += sva.OMEGA
 
             # TODO implement angular shite
+

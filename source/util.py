@@ -40,22 +40,32 @@ class Triangle(Shape):
         self.textureMap = [[0,0], [0, 1], [1,1]]
         super().__init__(color, texture)
 
-class Vector(namedtuple('__Vector', 'x y z')):
-    p_x       = 0
-    p_y       = 0
-    p_z       = 0
+class Vector(object):
 
-    def __new__(cls, x, y, z):
-        return super(Vector, cls).__new__(cls, x, y, z)
+    def __init__(self, x=0, y=0, z=0):
+        self.x = x
+        self.y = y
+        self.z = z
+    # def __new__(cls, x, y, z):
+    #     return super(Vector, cls).__new__(cls, x, y, z)
 
     def __add__(self, other):
-        x, y, z = self
-        return Vector(x+other.x,y+other.y,z+other.z)
+        return Vector(self.x+other.x,self.y+other.y,self.z+other.z)
 
     def __iadd__(self, other):
-        x, y, z = self
-        return Vector(x+other.x,y+other.y,z+other.z)
+        return Vector(self.x+other.x,self.y+other.y,self.z+other.z)
 
+    def __sub__(self, other):
+        return Vector(self.x-other.x,self.y-other.y,self.z-other.z)
+
+    def __isub__(self, other):
+        return Vector(self.x-other.x,self.y-other.y,self.z-other.z)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return "Vector: " + str(self.x) + ", " + str(self.y) + ", " + str(self.z)
     #TODO: Interface with numpy
 
 if __name__ == "__main__":

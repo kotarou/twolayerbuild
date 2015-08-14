@@ -12,6 +12,7 @@ class SVAComponent(Component):
         a_position=Vector(0,0,0), a_velocity=Vector(0,0,0), a_acceleration=Vector(0,0,0)):#, anchor=Vector(0,0,0)):
         super().__init__()
         # Linear
+        self.oldS = position
         self.S = position
         self.V = velocity
         self.A = acceleration

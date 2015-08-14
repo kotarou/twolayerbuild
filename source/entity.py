@@ -40,6 +40,7 @@ class Entity(object):
         if self._isComponent:
             raise Exception("Components cannot have a component added to them")
         self.eman.addComponent(self, component)
+        component.attach()
 
     def getComponentsByType(self, cType):
         return self.eman.componentsByType(self, cType)
@@ -72,6 +73,12 @@ class Component(Entity):
     def __init__(self):
         self.color = Color.next()
         self.owner = None
+
+    def attach(self):
+        """
+            Init code that requires the owner to have been specified
+        """
+        pass
 
 
 
