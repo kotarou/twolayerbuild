@@ -17,19 +17,21 @@ class CollisionSystem(System):
         # First, update for changes in SVA
         for e0, c0 in self.eman.pairsForType(CollisionComponent):
             d0 = Vector(0,0,0)
+            r0 = Vector(0,0,0)
             for sva in e0.getComponentsByType(SVAComponent):
+                # Offset by position
                 d0 += sva.S
-                d0 -= sva.oldS
-            #print(d0)
+                r0 += sva.THETA
+
             if c0.active:
                 for e1, c1 in self.eman.pairsForType(CollisionComponent):
                     if e0 is not e1 and c1.active:
                         d1 = Vector(0,0,0)
+                        r1 = Vector(0,0,0)
                         for sva in e1.getComponentsByType(SVAComponent):
                             d1 += sva.S
-                            d1 -= sva.oldS
-                        #print(d1)
-                        bCollides = c0.collidesWith(d0, d1, c1)
+                            r1 += sva.THETA
+                        bCollides = c0.collidesWith(d0, d1, r0, r1, c1)
                         if bCollides:
                             print(e0, " collides with ", e1)
 

@@ -19,6 +19,7 @@ class SVAComponent(Component):
         # Rotational
         # Ie, rotation around x axis, y axis, z axis (euler angles)
         # Very simple, temporary code.
+        # Note that this is in degrees
         self.THETA = a_position
         # theta, phi,
         self.OMEGA = a_velocity

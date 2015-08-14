@@ -129,7 +129,7 @@ class World(object):
         parseString = """
 print("hi!!!")
         """
-        x.addComponent(SVAComponent(Vector(10,10,0),a_velocity=Vector(0,0,0)))
+        x.addComponent(SVAComponent(Vector(10,10,0),a_velocity=Vector(0,0,1)))
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
         x.addComponent(MouseHoverComponent("Hovered!"))
         #x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
@@ -139,7 +139,7 @@ print("hi!!!")
             }))
         #x.addComponent(KeyHoldComponent(Key(key.B, 0), "grrrr!"))
         x.addComponent(Health(10))
-        x.addComponent(CollisionComponent())
+        x.addComponent(CollisionComponent(useAABB=True))
         y = tempClass3(Color.next(), self.entity_manager)
         y.addComponent(SVAComponent(Vector(100,-100,0)))
         y.addComponent((MeshComponent(
@@ -150,7 +150,7 @@ print("hi!!!")
             texture = textures[2],
         )))
         y.addComponent(MouseClickComponent("Stay away!"))
-        y.addComponent(CollisionComponent())
+        y.addComponent(CollisionComponent(useAABB=True))
         y.addComponent(KeyHoldComponent({Key(key.W, 0): ["""
 owner.getSingleComponentByType(SVAComponent).S += Vector(0,1,0)
 """]}))

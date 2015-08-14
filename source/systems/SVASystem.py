@@ -21,6 +21,10 @@ class SVASystem(System):
             # Rotational
             sva.OMEGA += sva.ALPHA
             sva.THETA += sva.OMEGA
+            # if sva.THETA > 360:
+            #     sva.THETA -= 360
+            # if sva.THETE < -360:
+            #     sva.THETA += 360
 
             # TODO implement angular shite
 
