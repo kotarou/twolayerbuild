@@ -15,5 +15,6 @@ class MouseClickComponent(Component):
     def onClick(self, e, x, y):
         print(self.response)
         for e, health in e.eman.pairsForType(Health):
-            health.hp = health.hp - 1;
-            print(health.hp)
+            if health.alive:
+                health.hp = health.hp - 1;
+                print(health.hp)

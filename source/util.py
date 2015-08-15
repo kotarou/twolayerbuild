@@ -74,6 +74,23 @@ class Vector(object):
     def w(self, v):
         self.array[3] = v
 
+    def angleWrap(self):
+        if self.x > 360:
+            self.x -= 360
+        if self.x < -360:
+            self.x += 360
+        if self.y > 360:
+            self.y -= 360
+        if self.y < -360:
+            self.y += 360
+        if self.z > 360:
+            self.z -= 360
+        if self.z < -360:
+            self.z += 360
+        # Its an angle!
+        if self.w == 1:
+            self.w = 0
+
     def fromNP(npArray, rot=False):
         if len(npArray) is 4:
             return Vector(npArray[0],npArray[1],npArray[2],npArray[3])

@@ -191,7 +191,7 @@ owner.getSingleComponentByType(SVAComponent).S += Vector(1,0,0)
             # Set the hover state of the current object to True
             for hoverable in game.world.entity_manager.componentByType(mesh.owner, MouseHoverComponent):
                 hoverable.active = True
-            print("Hovering over object at", x, y)
+            #print("Hovering over object at", x, y)
             game.world.hoverItem = mesh.owner
         except KeyError:
             # We are hovering over nothing.

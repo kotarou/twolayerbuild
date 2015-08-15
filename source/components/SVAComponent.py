@@ -9,7 +9,7 @@ from pyglet.window import key
 class SVAComponent(Component):
     __slots__ = "S", "V", "A", "THETA", "OMEGA", "ALPHA", "anchor"
     def __init__(self, position=Vector(0,0,0), velocity=Vector(0,0,0), acceleration=Vector(0,0,0),
-        a_position=Vector(0,0,0), a_velocity=Vector(0,0,0), a_acceleration=Vector(0,0,0)):#, anchor=Vector(0,0,0)):
+        a_position=Vector(0,0,0), a_velocity=Vector(0,0,0), a_acceleration=Vector(0,0,0), bounded = True):#, anchor=Vector(0,0,0)):
         super().__init__()
         # Linear
         self.oldS = position
@@ -24,6 +24,8 @@ class SVAComponent(Component):
         # theta, phi,
         self.OMEGA = a_velocity
         self.ALPHA = a_acceleration
+
+        self.bounded = bounded
 
         #self.anchor = anchor
 

@@ -13,5 +13,6 @@ class HealthSystem(System):
 
     def update (self, _):
         for e, health in self.eman.pairsForType(Health):
-            if health.hp <= 0:
+            if health.hp <= 0 and health.alive:
+                health.alive = False
                 print("I died!")
