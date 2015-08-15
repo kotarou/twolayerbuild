@@ -41,15 +41,24 @@ class Map:
         self.set_adjacent(self, i,ii)
 
     # set tiles to rooms
-    for room in self.basicrooms:
-      pass
-
-
+    # for each room
+    for roomname, values in self.basicrooms.items():
+      # get all the subrooms that make it up
+      for value in values:
+        # start of subroom
+        sx = value[0][0]
+        sy = value[0][1]
+        # end of subroom
+        ex = value[1][0]
+        ey = value[1][1]
+        # set all the tiles to that room
+        for i in xrange(sx, ex):
+          for ii in xrange(sy,ey)
+            self.gamemap[ii][i].rooms.append(roomname)
 
   # set all the adjacencys up
   def set_adjacent(self, i, ii):
-
-    # first the regular directions
+    # first the regular directions lets leave diagonals for later
     if i != 0:
       self.gamemap[ii][i].above = self.gamemap[ii][i-1]
 
@@ -61,8 +70,6 @@ class Map:
 
     if ii != mapx:
       self.gamemap[ii][i].right = self.gamemap[ii+1][i]
-
-    # now a bunch of diagonals
 
   # Load a map from file
   def load(self, filepath):

@@ -17,19 +17,13 @@ class Tile:
     self.right = None
     self.below = None
 
-    # diagonally adjacent
-    self.adjacentdiag = []
-
-    #vertically or horizontally adjacent
-    self.adjacentxy = []
-
     self.navigatable = True
     self.rooms = []
     self.contents = []
 
     # set its texture based on character in map
     # also if it is navigatable
-    if symbol == "#:
+    if symbol == "#":
       pass
 
     elif symbol == "*":
