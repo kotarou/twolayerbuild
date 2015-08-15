@@ -24,8 +24,8 @@ class RenderSystem(System):
                 glRotatef(sva.THETA.z,0,0,1)
             vList = pyglet.graphics.vertex_list(
                     mesh.numVert,
-    #('v2i', (5,10, 15,20, 25,30, 35,40, 45,50, 55,60 )),
-    #('c3B', (0,0,255, 0,255,0, 0,0,255, 0,255,0, 0,0,255, 0,255,0))
+                    #('v2i', (5,10, 15,20, 25,30, 35,40, 45,50, 55,60 )),
+                    #('c3B', (0,0,255, 0,255,0, 0,0,255, 0,255,0, 0,0,255, 0,255,0))
                     mesh.vertexList,
                     # TODO: Support normals
                     #mesh.normalList if mesh.normal else None,
@@ -38,4 +38,3 @@ class RenderSystem(System):
             vList.draw(mesh.mode)
             if mesh.textured:
                 glDisable(GL_TEXTURE_2D)
-

@@ -112,14 +112,6 @@ class World(object):
         self.system_manager.addSystem("pick", PickSystem())
 
         x = tempClass3(Color.next(), self.entity_manager)
-        # x.addComponent(MeshComponent(
-        # vertexList = [ [100, -100, 0],
-        #                     [100, 100, 0],
-        #                     [-100, 100, 0]],
-        # indexList  = [[0,1,2]],
-        # colored=True,
-        # colorList=Color.Red
-        # ))
         x.addComponent(MeshComponent(
         GL_TRIANGLES,
             ('v3f', (0,0,0, 50,0,0, 50,50,0, 0,50,0)),
@@ -140,6 +132,7 @@ print("hi!!!")
         #x.addComponent(KeyHoldComponent(Key(key.B, 0), "grrrr!"))
         x.addComponent(Health(10))
         x.addComponent(CollisionComponent(useAABB=True))
+
         y = tempClass3(Color.next(), self.entity_manager)
         y.addComponent(SVAComponent(Vector(100,-100,0)))
         y.addComponent((MeshComponent(

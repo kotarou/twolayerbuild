@@ -43,16 +43,113 @@ class Triangle(Shape):
 
 class Vector(object):
 
-    def __init__(self, x=0, y=0, z=0):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.w = 1
-    # def __new__(cls, x, y, z):
-    #     return super(Vector, cls).__new__(cls, x, y, z)
+    def __init__(self, x=0, y=0, z=0, w=1):
+        self.array = np.array([x, y, z, w])
+
+    @property
+    def x(self):
+        return self.array[0]
+    @x.setter
+    def x(self, v):
+        self.array[0] = v
+
+    @property
+    def y(self):
+        return self.array[1]
+    @y.setter
+    def y(self, v):
+        self.array[1] = v
+
+    @property
+    def z(self):
+        return self.array[2]
+    @z.setter
+    def z(self, v):
+        self.array[2] = v
+
+    @property
+    def w(self):
+        return self.array[3]
+    @w.setter
+    def w(self, v):
+        self.array[3] = v
+
+    def fromNP(npArray, rot=False):
+        if len(npArray) is 4:
+            return Vector(npArray[0],npArray[1],npArray[2],npArray[3])
+        elif len(npArray) is 3:
+            print(npArray[2])
+            return Vector(npArray[0],npArray[1],npArray[2],0 if rot else 1)
+
+    def __add__(self, other):
+        if type(other) == Vector:
+            # We do not change w or make it a value other than 1/0
+            return Vector(self.array[0] + other.array[0], self.array[1] + other.array[1], self.array[2] + other.array[2], self.array[3])
+        else:
+            return Vector.fromNP(self.array + other)
+
+    # def __iadd__(self, other):
+    #     if type(other) == Vector:
+    #         self.x = self.x + other.x
+    #         self.y = self.y + other.y
+    #         self.z = self.z + other.z
+    #     else:
+    #         self.array[0] += other
+    #         self.array[1] += other
+    #         self.array[2] += other
+    #     return self
+
+    def __sub__(self, other):
+        if type(other) == Vector:
+            # We do not change w or make it a value other than 1/0
+            return Vector(self.array[0] - other.array[0], self.array[1] - other.array[1], self.array[2] - other.array[2], self.array[3])
+        else:
+            return Vector.fromNP(self.array + other)
+
+    # def __isub__(self, other):
+    #     if type(other) == Vector:
+    #         self.array[0] -= other.array[0]
+    #         self.array[1] -= other.array[1]
+    #         self.array[2] -= other.array[2]
+    #     else:
+    #         self.array[0] -= other
+    #         self.array[1] -= other
+    #         self.array[2] -= other
+    #     return self
+
+    def __mul__(self, other):
+        if type(other) == Vector:
+            # We do not change w or make it a value other than 1/0
+            return Vector(self.array[0] * other.array[0], self.array[1] * other.array[1], self.array[2] * other.array[2], self.array[3])
+        else:
+            return Vector.fromNP(self.array + other)
+
+    # def __imul__(self, other):
+    #     if type(other) == Vector:
+    #         self.array[0] *= other.array[0]
+    #         self.array[1] *= other.array[1]
+    #         self.array[2] *= other.array[2]
+    #     else:
+    #         self.array[0] *= other
+    #         self.array[1] *= other
+    #         self.array[2] *= other
+    #     return self
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return str(self.array)
+    #TODO: Interface with numpy
+
+    def dot(self, other):
+        raise Exception("Vector dot method not tested.")
+        return Vector.fromNP(self.array.dot(other.array))
 
     def rotate(self, rx, ry, rz):
-        j = np.array([self.x, self.y, self.z, self.w])
+        """
+            Simple rotations: rotate rx degrees around the x axis, ry around y...
+        """
         rx = math.radians(rx)
         ry = math.radians(ry)
         rz = math.radians(rz)
@@ -63,9 +160,9 @@ class Vector(object):
                      [0,0,0,1]
                      ])
         ryy = np.array([
-                     [math.cos(rx),0,-math.sin(rx),0],
+                     [math.cos(ry),0,-math.sin(ry),0],
                      [0,1,0,0],
-                     [math.sin(rx),0,math.cos(rx),0],
+                     [math.sin(ry),0,math.cos(ry),0],
                      [0,0,0,1]
                      ])
         rzz = np.array([
@@ -74,33 +171,14 @@ class Vector(object):
                      [0,0,1,0],
                      [0,0,0,1]
                      ])
-        j = j.dot(rxx).dot(ryy).dot(rzz)
-        self.x = j[0]
-        self.y = j[1]
-        self.z = j[2]
-
-
-    def __add__(self, other):
-        return Vector(self.x+other.x,self.y+other.y,self.z+other.z)
-
-    def __iadd__(self, other):
-        return Vector(self.x+other.x,self.y+other.y,self.z+other.z)
-
-    def __sub__(self, other):
-        return Vector(self.x-other.x,self.y-other.y,self.z-other.z)
-
-    def __isub__(self, other):
-        return Vector(self.x-other.x,self.y-other.y,self.z-other.z)
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        return "Vector: " + str(self.x) + ", " + str(self.y) + ", " + str(self.z)
-    #TODO: Interface with numpy
+        self.array = self.array.dot(rxx).dot(ryy).dot(rzz)
 
 if __name__ == "__main__":
     p = Vector(1,2,3)
     r = Vector(1,1,1)
-    p.rotate(0, 0, 270)
+    p.rotate(0, 0, 180)
     print(p)
+    p += 2
+    print(p)
+    q = p * 3
+    print(q)
