@@ -31,13 +31,13 @@ class Map:
     self.basicrooms = datas[2]
 
     # build the map as a 2d list of tiles
-    for i in xrange(0, mapy):
-      for ii in xrange(0, mapx):
-        self.gamemap[ii][i] = Tile(self.basicmap[ii][i],ii,i)
+    for i in range(0, self.mapy):
+      for ii in range(0, self.mapx):
+        self.gamemap[ii][i] = tile.Tile(self.basicmap[ii][i],ii,i)
 
     # precompute adjacent tiles
-    for i in xrange(0, mapy):
-      for ii in xrange(0, mapx):
+    for i in xrange(0, self.mapy):
+      for ii in xrange(0, self.mapx):
         self.set_adjacent(self, i,ii)
 
     # set tiles to rooms
@@ -52,8 +52,8 @@ class Map:
         ex = value[1][0]
         ey = value[1][1]
         # set all the tiles to that room
-        for i in xrange(sx, ex):
-          for ii in xrange(sy, ey)
+        for i in range(sx, ex):
+          for ii in range(sy, ey):
             self.gamemap[ii][i].rooms.append(roomname)
 
   # set all the adjacencies up
@@ -125,7 +125,7 @@ class Map:
 if __name__ == "__main__":
   mapname = 'resources/map.dat'
   # Config file is in root of the project
-  mappath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapname)
+  #mappath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapname)
   loader = Map()
-  p = loader.load(mappath)
-  print(p)
+  #p = loader.load(mappath)
+  #print(p)
