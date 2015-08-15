@@ -53,10 +53,10 @@ class Map:
         ey = value[1][1]
         # set all the tiles to that room
         for i in xrange(sx, ex):
-          for ii in xrange(sy,ey)
+          for ii in xrange(sy, ey)
             self.gamemap[ii][i].rooms.append(roomname)
 
-  # set all the adjacencys up
+  # set all the adjacencies up
   def set_adjacent(self, i, ii):
     # first the regular directions lets leave diagonals for later
     if i != 0:
