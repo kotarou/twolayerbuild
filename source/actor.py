@@ -8,5 +8,10 @@
 class actor:
 
 
-    def __init__(self, identifier):
+    def __init__(self, identifier, posx, posy):
       self.identifier = identifier
+      self.posx = posx
+      self.posy = posy
+
+      # Tile it is standing on
+      self.location = None
