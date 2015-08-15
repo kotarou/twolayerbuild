@@ -88,52 +88,26 @@ class Vector(object):
         else:
             return Vector.fromNP(self.array + other)
 
-    # def __iadd__(self, other):
-    #     if type(other) == Vector:
-    #         self.x = self.x + other.x
-    #         self.y = self.y + other.y
-    #         self.z = self.z + other.z
-    #     else:
-    #         self.array[0] += other
-    #         self.array[1] += other
-    #         self.array[2] += other
-    #     return self
-
     def __sub__(self, other):
         if type(other) == Vector:
             # We do not change w or make it a value other than 1/0
             return Vector(self.array[0] - other.array[0], self.array[1] - other.array[1], self.array[2] - other.array[2], self.array[3])
         else:
-            return Vector.fromNP(self.array + other)
-
-    # def __isub__(self, other):
-    #     if type(other) == Vector:
-    #         self.array[0] -= other.array[0]
-    #         self.array[1] -= other.array[1]
-    #         self.array[2] -= other.array[2]
-    #     else:
-    #         self.array[0] -= other
-    #         self.array[1] -= other
-    #         self.array[2] -= other
-    #     return self
+            return Vector.fromNP(self.array - other)
 
     def __mul__(self, other):
         if type(other) == Vector:
             # We do not change w or make it a value other than 1/0
             return Vector(self.array[0] * other.array[0], self.array[1] * other.array[1], self.array[2] * other.array[2], self.array[3])
         else:
-            return Vector.fromNP(self.array + other)
+            return Vector.fromNP(self.array * other)
 
-    # def __imul__(self, other):
-    #     if type(other) == Vector:
-    #         self.array[0] *= other.array[0]
-    #         self.array[1] *= other.array[1]
-    #         self.array[2] *= other.array[2]
-    #     else:
-    #         self.array[0] *= other
-    #         self.array[1] *= other
-    #         self.array[2] *= other
-    #     return self
+    def __truediv__(self, other):
+        if type(other) == Vector:
+            # We do not change w or make it a value other than 1/0
+            return Vector(self.array[0] / other.array[0], self.array[1] / other.array[1], self.array[2] / other.array[2], self.array[3])
+        else:
+            return Vector.fromNP(self.array / other)
 
     def __repr__(self):
         return self.__str__()
