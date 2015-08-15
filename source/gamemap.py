@@ -17,12 +17,16 @@ class Map:
     mappath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapname)
     datas = self.load(mappath)
 
+    # initialise local values, adjusted for 0 indexes
+    self.mapx = (datas[0][0])
+    self.mapy = (datas[0][1])
+
     # 2d list of tiles
     self.gamemap = []
 
-    # initialise local values
-    self.mapx = datas[0][0]
-    self.mapy = datas[0][1]
+    # seed with empty lists
+    for slot in range(0,self.mapy):
+      self.gamemap.append([])
 
     # rudementry map
     self.basicmap = datas[1]
@@ -33,12 +37,16 @@ class Map:
     # build the map as a 2d list of tiles
     for i in range(0, self.mapy):
       for ii in range(0, self.mapx):
-        self.gamemap[ii][i] = tile.Tile(self.basicmap[ii][i],ii,i)
+        #print("doing " + str(i) +" "+ str(ii))
+        self.gamemap[ii].insert(i, tile.Tile(self.basicmap[ii][i],ii,i))
 
     # precompute adjacent tiles
-    for i in xrange(0, self.mapy):
-      for ii in xrange(0, self.mapx):
-        self.set_adjacent(self, i,ii)
+    for i in range(0, self.mapy):
+      for ii in range(0, self.mapx):
+        print(i, ii)
+        print(self.mapx)
+        print(len(self.gamemap))
+        self.set_adjacent(i, ii)
 
     # set tiles to rooms
     # for each room
@@ -59,16 +67,26 @@ class Map:
   # set all the adjacencies up
   def set_adjacent(self, i, ii):
     # first the regular directions lets leave diagonals for later
+    #print("doing " + str(i) +" "+ str(ii))
     if i != 0:
+      print("above")
       self.gamemap[ii][i].above = self.gamemap[ii][i-1]
 
     if ii != 0:
+      print("left")
       self.gamemap[ii][i].left = self.gamemap[ii-1][i]
 
-    if i != mapy:
+    if i != self.mapy -1:
+      print("below")
       self.gamemap[ii][i].below = self.gamemap[ii][i+1]
 
-    if ii != mapx:
+    if ii != self.mapx -1:
+      print("right")
+      #print(self.mapx)
+
+      #print(len(self.gamemap))
+      #print(self.gamemap[ii+1][i])
+      
       self.gamemap[ii][i].right = self.gamemap[ii+1][i]
 
   # Load a map from file
@@ -121,6 +139,9 @@ class Map:
       proc = pair.split(',')
       return (int(proc[0]),int(proc[1]))
 
+
+  def draw(self):
+    pass
 
 if __name__ == "__main__":
   mapname = 'resources/map.dat'

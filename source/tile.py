@@ -11,6 +11,7 @@ class Tile:
     self.y = y
 
     self.texture = 0
+    self.symbol = symbol
 
     self.above = None
     self.left = None
@@ -37,6 +38,9 @@ class Tile:
 
     else:
       print("oopsy " + symbol)
+
+  def asserthasadj(self):
+      pass
 
   def is_adjacent_room(self, room):
       pass
