@@ -50,9 +50,9 @@ class Tile:
     if self.right != None:
       ret += "r"
 
-    if self.down != None:
+    if self.below != None:
       ret += "d"
-      
+
     return ret
 
   def asserthasadj(self):
