@@ -1,31 +1,77 @@
-from abc import ABCMeta, abstractmethod
-import pyglet
-
+# -*- coding: utf-8 -*-
+"""
+@author: Till
+"""
 
 class Tile:
 
-    __metaclass__ = ABCMeta
+  def __init__(self, symbol, x, y):
 
-    name = ""
-    description = ""
-    identifier = ""
+    self.x = x
+    self.y = y
 
-    navigatable = ""
-    draw = ""
-    owner = ""
+    self.texture = 0
+    self.symbol = symbol
 
-    # refers to index in list, should eventually be a dict and by name
-    texture = 0
+    self.above = None
+    self.left = None
+    self.right = None
+    self.below = None
 
-    pos = ([0.0, 0.0])
+    self.navigatable = True
+    self.rooms = []
+    self.contents = []
 
-    def __init__(self, identifier, owner, inX, inY):
-        self.identifier = identifier
-        self.pos[0] = inX
-        self.pos[1] = inY
-        self.owner = owner
+    # set its texture based on character in map
+    # also if it is navigatable
+    if symbol == "#":
+      pass
 
-    # TODO: is called when an entity moves onto this tile?
-    #	When some other things calls its trigger?
-    @abstractmethod
-    def trigger(self): pass
+    elif symbol == "*":
+      pass
+
+    elif symbol == ".":
+      pass
+
+    elif symbol == "@":
+      pass
+
+    elif symbol == "=":
+      pass
+      
+    else:
+      print("oopsy " + symbol)
+
+  def adjsymbol(self):
+    ret = ""    
+    if self.above != None:
+      ret += "a"
+
+    if self.left != None:
+      ret += "l"
+
+    if self.right != None:
+      ret += "r"
+
+    if self.below != None:
+      ret += "d"
+
+    return ret
+
+  def asserthasadj(self):
+    pass
+
+  def is_adjacent_room(self, room):
+    pass
+
+  def is_diag_adjacent_room(self, room):
+    pass
+
+  def add_content(self, content):
+    pass
+
+  def remove_content(self, identifier):
+    pass
+
+  def contains(self, identifier):
+    pass

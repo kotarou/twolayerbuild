@@ -1,47 +1,88 @@
+# -*- coding: utf-8 -*-
+"""
+@author: Till
+"""
+
+
 import pyglet, tile, os
-# lets assume we are calling from the source dir
-mapname = os.path.join('resources','map.dat')
 
 class Map:
 
-  tileDict = {} # a map of the tile classes used in the current map
-  roomDict = {} # a map of the rooms used in the current map -
-
   # basically test code atm
-  def __init__(self):
+  def __init__(self, mappath):
     # First we load the map
     # Config file is in root of the project
-    mappath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapname)
-    self.load(mappath)
+    datas = self.load(mappath)
 
+    # initialise local values, adjusted for 0 indexes
+    self.mapx = (datas[0][0])
+    self.mapy = (datas[0][1])
 
-    self.createTileObject((0,True, "."))
-    createRoom(tileDict[0], 0, 0, 0, 5, 5)
-    for rooms in roomDict:
-      for tiles in rooms:
-        print(str(navigatable))
+    # 2d list of tiles
+    self.gamemap = []
 
-  # defines the tiles used in the current map
-  # takes tileTypeIn[]:
-  #  [0] is always the tile class reference name - unique
-  #  [n], where 1-n define the tile's properties.
+    # seed with empty lists
+    for slot in range(0,self.mapy):
+      self.gamemap.append([])
 
-  def createTileObject(self, tileTypeIn):
-    tileDict[tileTypeIn[0]] = Tile.type(str(tileTypeIn[0]), (), {'navigatable': tileTypeIn[1], 'draw': tileTypeIn[2]})
+    # rudementry map
+    self.basicmap = datas[1]
 
-  # creates each of the rooms
-  # adds the room to the roomDict
-  # also modifies the rooms if needed - checking if a tile exists at the coordinates given and if so, replaces it
-  #  Does this by:
-  #  Checking if there is a tile at the said coordinates
-  #  If so, removing the tile's reference from whatever room it is associated with
-  #  Then dereferencing it from the map itself
+    # rudementry rooms
+    self.basicrooms = datas[2]
 
-  def createRoom(self, tileNameIn, roomNameIn, xStart, yStart, xEnd, yEnd):
-    for i in range(xStart, xEnd):
-      for j in range(yStart, yEnd):
-        roomDict[roomNameIn] += tileDict[tileNameIn].init(roomDict[roomNameIn], i, j)
+    # build the map as a 2d list of tiles
+    for i in range(0, self.mapy):
+      for ii in range(0, self.mapx):
+        #print("doing " + str(i) +" "+ str(ii))
+        self.gamemap[ii].insert(i, tile.Tile(self.basicmap[ii][i],ii,i))
 
+    # precompute adjacent tiles
+    for i in range(0, self.mapy):
+      for ii in range(0, self.mapx):
+        #print(i, ii)
+        #print(self.mapx)
+        #print(len(self.gamemap))
+        self.set_adjacent(i, ii)
+
+    # set tiles to rooms
+    # for each room
+    for roomname, values in self.basicrooms.items():
+      # get all the subrooms that make it up
+      #print(roomname)
+      for value in values:
+        #print(value)
+        # start of subroom
+        sx = value[0][0]
+        sy = value[0][1]
+        # end of subroom
+        ex = value[1][0]
+        ey = value[1][1]
+        # set all the tiles to that room
+        for i in range(sx, ex+1):
+          for ii in range(sy, ey+1):
+            #print(str(i) + "," +str(ii))
+            self.gamemap[ii][i].rooms.append(roomname)
+
+  # set all the adjacencies up
+  def set_adjacent(self, i, ii):
+    # first the regular directions lets leave diagonals for later
+    #print("doing " + str(i) +" "+ str(ii))
+    if i != 0:
+      #print("above")
+      self.gamemap[ii][i].left = self.gamemap[ii][i-1]
+
+    if ii != 0:
+      #print("left")
+      self.gamemap[ii][i].above = self.gamemap[ii-1][i]
+
+    if i != self.mapy -1:
+      #print("below")
+      self.gamemap[ii][i].right = self.gamemap[ii][i+1]
+
+    if ii != self.mapx -1:
+      #print("right")
+      self.gamemap[ii][i].below = self.gamemap[ii+1][i]
 
   # Load a map from file
   def load(self, filepath):
@@ -93,11 +134,45 @@ class Map:
       proc = pair.split(',')
       return (int(proc[0]),int(proc[1]))
 
+  # prints out a representation of the map
+  def draw(self):
+    for row in self.gamemap:
+      x = ""
+      for tile in row:
+        x += tile.symbol
+      print(x)
 
+  # ensures they have sane adjacencies
+  def printadj(self):
+    # first print them, see if it looks good
+    for row in self.gamemap:
+      x = ""
+      for tile in row:
+        x += (tile.adjsymbol() + " ")
+      print(x)
+    # here will be some other tests
+
+  def printrooms(self):
+    for row in self.gamemap:
+      x = ""
+      for tile in row:
+        for room in tile.rooms:
+          x += (room + " ")  
+        x += ("|")
+      print(x)
+
+
+
+# Debug
 if __name__ == "__main__":
-  mapname = 'resources/map.dat'
+
+  mapn = os.path.join('resources','map.dat')
+  mapp = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapn)
   # Config file is in root of the project
-  mappath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapname)
-  loader = Map()
-  p = loader.load(mappath)
-  print(p)
+  #mappath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapname)
+  loader = Map(mapp)
+  loader.printrooms()
+  loader.draw()
+  loader.printadj()
+  #p = loader.load(mappath)
+  #print(p)
