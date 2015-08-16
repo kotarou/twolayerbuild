@@ -82,11 +82,6 @@ class Map:
 
     if ii != self.mapx -1:
       print("right")
-      #print(self.mapx)
-
-      #print(len(self.gamemap))
-      #print(self.gamemap[ii+1][i])
-      
       self.gamemap[ii][i].right = self.gamemap[ii+1][i]
 
   # Load a map from file
@@ -139,9 +134,22 @@ class Map:
       proc = pair.split(',')
       return (int(proc[0]),int(proc[1]))
 
-
+  # prints out a representation of the map
   def draw(self):
-    pass
+    for row in self.gamemap:
+      x = ""
+      for tile in row:
+        x += tile.symbol
+      print(x)
+
+  # ensures they have sane adjacencies
+  def checkadj(self):
+        for row in self.gamemap:
+      x = ""
+      for tile in row:
+        x += tile.adjsymbol()
+      print(x)
+
 
 if __name__ == "__main__":
   mapname = 'resources/map.dat'

@@ -39,20 +39,36 @@ class Tile:
     else:
       print("oopsy " + symbol)
 
+  def adjsymbol(self):
+    ret = ""    
+    if self.above != None:
+      ret += "a"
+
+    if self.left != None:
+      ret += "l"
+
+    if self.right != None:
+      ret += "r"
+
+    if self.down != None:
+      ret += "d"
+      
+    return ret
+
   def asserthasadj(self):
-      pass
+    pass
 
   def is_adjacent_room(self, room):
-      pass
+    pass
 
   def is_diag_adjacent_room(self, room):
-      pass
+    pass
 
   def add_content(self, content):
-      pass
+    pass
 
   def remove_content(self, identifier):
-      pass
+    pass
 
   def contains(self, identifier):
-      pass
+    pass
