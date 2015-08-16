@@ -36,6 +36,9 @@ class Tile:
     elif symbol == "@":
       pass
 
+    elif symbol == "=":
+      pass
+      
     else:
       print("oopsy " + symbol)
 

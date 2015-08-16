@@ -5,16 +5,13 @@
 
 
 import pyglet, tile, os
-# lets assume we are calling from the source dir
-mapname = os.path.join('resources','map.dat')
 
 class Map:
 
   # basically test code atm
-  def __init__(self):
+  def __init__(self, mappath):
     # First we load the map
     # Config file is in root of the project
-    mappath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapname)
     datas = self.load(mappath)
 
     # initialise local values, adjusted for 0 indexes
@@ -43,16 +40,18 @@ class Map:
     # precompute adjacent tiles
     for i in range(0, self.mapy):
       for ii in range(0, self.mapx):
-        print(i, ii)
-        print(self.mapx)
-        print(len(self.gamemap))
+        #print(i, ii)
+        #print(self.mapx)
+        #print(len(self.gamemap))
         self.set_adjacent(i, ii)
 
     # set tiles to rooms
     # for each room
     for roomname, values in self.basicrooms.items():
       # get all the subrooms that make it up
+      #print(roomname)
       for value in values:
+        #print(value)
         # start of subroom
         sx = value[0][0]
         sy = value[0][1]
@@ -60,8 +59,9 @@ class Map:
         ex = value[1][0]
         ey = value[1][1]
         # set all the tiles to that room
-        for i in range(sx, ex):
-          for ii in range(sy, ey):
+        for i in range(sx, ex+1):
+          for ii in range(sy, ey+1):
+            #print(str(i) + "," +str(ii))
             self.gamemap[ii][i].rooms.append(roomname)
 
   # set all the adjacencies up
@@ -69,19 +69,19 @@ class Map:
     # first the regular directions lets leave diagonals for later
     #print("doing " + str(i) +" "+ str(ii))
     if i != 0:
-      print("above")
+      #print("above")
       self.gamemap[ii][i].left = self.gamemap[ii][i-1]
 
     if ii != 0:
-      print("left")
+      #print("left")
       self.gamemap[ii][i].above = self.gamemap[ii-1][i]
 
     if i != self.mapy -1:
-      print("below")
+      #print("below")
       self.gamemap[ii][i].right = self.gamemap[ii][i+1]
 
     if ii != self.mapx -1:
-      print("right")
+      #print("right")
       self.gamemap[ii][i].below = self.gamemap[ii+1][i]
 
   # Load a map from file
@@ -163,14 +163,16 @@ class Map:
 
 
 
-
+# Debug
 if __name__ == "__main__":
-  mapname = 'resources/map.dat'
+
+  mapn = os.path.join('resources','map.dat')
+  mapp = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapn)
   # Config file is in root of the project
   #mappath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapname)
-  loader = Map()
+  loader = Map(mapp)
   loader.printrooms()
   loader.draw()
-  #loader.printadj()
+  loader.printadj()
   #p = loader.load(mappath)
   #print(p)
