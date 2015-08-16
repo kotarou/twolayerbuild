@@ -143,7 +143,7 @@ class Map:
       print(x)
 
   # ensures they have sane adjacencies
-  def checkadj(self):
+  def printadj(self):
     # first print them, see if it looks good
     for row in self.gamemap:
       x = ""
@@ -152,6 +152,16 @@ class Map:
       print(x)
     # here will be some other tests
 
+  def printrooms(self):
+    for row in self.gamemap:
+      x = ""
+      for tile in row:
+        for room in tile.rooms:
+          x += (room + " ")  
+        x += ("|")
+      print(x)
+
+
 
 
 if __name__ == "__main__":
@@ -159,7 +169,8 @@ if __name__ == "__main__":
   # Config file is in root of the project
   #mappath = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), mapname)
   loader = Map()
-  #loader.draw()
-  loader.checkadj()
+  loader.printrooms()
+  loader.draw()
+  #loader.printadj()
   #p = loader.load(mappath)
   #print(p)
