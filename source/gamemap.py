@@ -70,19 +70,19 @@ class Map:
     #print("doing " + str(i) +" "+ str(ii))
     if i != 0:
       print("above")
-      self.gamemap[ii][i].above = self.gamemap[ii][i-1]
+      self.gamemap[ii][i].left = self.gamemap[ii][i-1]
 
     if ii != 0:
       print("left")
-      self.gamemap[ii][i].left = self.gamemap[ii-1][i]
+      self.gamemap[ii][i].above = self.gamemap[ii-1][i]
 
     if i != self.mapy -1:
       print("below")
-      self.gamemap[ii][i].below = self.gamemap[ii][i+1]
+      self.gamemap[ii][i].right = self.gamemap[ii][i+1]
 
     if ii != self.mapx -1:
       print("right")
-      self.gamemap[ii][i].right = self.gamemap[ii+1][i]
+      self.gamemap[ii][i].below = self.gamemap[ii+1][i]
 
   # Load a map from file
   def load(self, filepath):
