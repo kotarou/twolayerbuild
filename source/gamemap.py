@@ -59,10 +59,10 @@ class Map:
         ex = value[1][0]
         ey = value[1][1]
         # set all the tiles to that room
-        for i in range(sx, ex+1):
-          for ii in range(sy, ey+1):
+        for i in range(sy, ey+1):
+          for ii in range(sx, ex+1):
             #print(str(i) + "," +str(ii))
-            self.gamemap[ii][i].rooms.append(roomname)
+            self.gamemap[i][ii].rooms.append(roomname)
 
   # set all the adjacencies up
   def set_adjacent(self, i, ii):
