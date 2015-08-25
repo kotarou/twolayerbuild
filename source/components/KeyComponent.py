@@ -13,7 +13,7 @@ from util import Vector
 class Key(namedtuple('__KeyCombination', 'symbol modifiers modMatters')):
     """
         A key + modifying keys combination.
-        A Key will register Key(symbol,mod) as being equal to Key(symbol,mod2) so long as mod is a subset of mob2 or vice versa
+        A Key will register Key(symbol,mod) as being equal to Key(symbol,mod2) so long as mod is a subset of mod2 or vice versa
         This way, random modifiers like numlock will not have an effect on playability.
         This does mean that differentiating ctrl+shift+x and ctrl+x is not currently possible
     """
@@ -22,20 +22,18 @@ class Key(namedtuple('__KeyCombination', 'symbol modifiers modMatters')):
     s_modifiers = 0
     s_modMatters = False
 
-
     def __new__(cls, symbol, modifiers, modMatters=False):
         return super(Key, cls).__new__(cls, symbol, modifiers, modMatters)
 
     def __eq__(self, other):
         symbol, modifiers, modMatters = self
-        if other == None:
+        if other is None:
             return False
 
         #the left is what we want to be pushed (normally) mand the right is what is being pushed (again, normally)
 
-
         if symbol == other.symbol:
-            if not modMatters or (modifiers & other.modifiers): # (not modMatters and not other.modMatters)
+            if not modMatters or (modifiers & other.modifiers):  # (not modMatters and not other.modMatters)
                 return True
         return False
 
@@ -46,7 +44,7 @@ class Key(namedtuple('__KeyCombination', 'symbol modifiers modMatters')):
         symbol, mod, modMatters = self
         # We do not care about modifiers when testing for presence in a dict / etc
         # Later code will check the modifiers anyway, and it is a small efficiency hit for a few false positives
-        return symbol # * 1000) + (mod * 100) # + (1 if modMatters else 0)
+        return symbol  # * 1000) + (mod * 100) # + (1 if modMatters else 0)
 
 class KeyComponent(Component):
 

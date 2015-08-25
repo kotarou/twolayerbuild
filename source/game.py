@@ -123,7 +123,10 @@ print("hi!!!")
         """
         x.addComponent(SVAComponent(Vector(10,10,0),a_velocity=Vector(0,0,1)))
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
-        x.addComponent(MouseHoverComponent("Hovered!"))
+        x.addComponent(MouseHoverComponent("""
+from random import uniform
+owner.getSingleComponentByType(SVAComponent).S += Vector(uniform(-100,100),uniform(-100,100),0)
+                       """, "Hovered!"))
         #x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
         x.addComponent(KeyPressComponent({
             Key(key.A, 0): 'print("asdf")',
