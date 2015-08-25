@@ -2,12 +2,11 @@
 """
 @author: Kotarou
 """
-import numpy as np
-from color import *
-import pyglet.graphics as pg
-from pyglet.gl import *
 
-import ctypes
+from color import *
+from util import Vector
+import components
+
 
 #from ecs.models import Component, System, Entity
 #from ecs.managers import EntityManager, SystemManager
@@ -19,9 +18,9 @@ class Entity(object):
         It may be better to split this into baseentity and entity to avoid component vs not component logic
         However, for now it is useful to have components and non-components identical
     """
-    def __init__(self, color, eman=None):
-        self.color = color
-        if eman == None:
+    def __init__(self, eman=None):
+        self.color = Color.next()
+        if eman is None:
             self._isComponent = True
         else:
             self._isComponent = False
@@ -41,6 +40,8 @@ class Entity(object):
             raise Exception("Components cannot have a component added to them")
         self.eman.addComponent(self, component)
         component.attach()
+
+    #def addSimpleMeshComponent(self, )
 
     def getComponentsByType(self, cType):
         return self.eman.componentsByType(self, cType)
@@ -80,9 +81,6 @@ class Component(Entity):
         """
         pass
 
-
-
 class tempClass3(Entity):
-    def __init__(self, color, eman):
-        super().__init__(color, eman)
-
+    def __init__(self, eman):
+        super().__init__(eman)

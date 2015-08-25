@@ -101,17 +101,24 @@ class World(object):
         # These components should update every tick
         self.entity_manager = EntityManager()
         self.system_manager = SystemManager(self.entity_manager)
+        # Component systems update first. These control game logic
         self.system_manager.addSystem("component", HealthSystem())
         self.system_manager.addSystem("component", SVASystem())
         self.system_manager.addSystem("component", CollisionSystem())
-        self.system_manager.addSystem("interaction", MouseHoverSystem())
 
+        # Interaction systems handle to user input. These update after the game logic has processed
+        self.system_manager.addSystem("interaction", MouseHoverSystem())
         self.system_manager.addSystem("interaction", KeyHoldSystem())
 
+        # Render systems handle anything that draws to the main game window
         self.system_manager.addSystem("render", RenderSystem())
+
+        # Pick systems also involve rendering, but to the color picking FBO instead.
         self.system_manager.addSystem("pick", PickSystem())
 
-        x = tempClass3(Color.next(), self.entity_manager)
+
+
+        x = tempClass3(self.entity_manager)
         x.addComponent(MeshComponent(
         GL_TRIANGLES,
             ('v3f', (0,0,0, 50,0,0, 50,50,0, 0,50,0)),
@@ -121,7 +128,9 @@ class World(object):
         parseString = """
 print("hi!!!")
         """
-        x.addComponent(SVAComponent(Vector(10,10,0),a_velocity=Vector(0,0,1)))
+        x.addSVAComponent(Vector(10,10,0),a_velocity=Vector(0,0,1))
+
+
         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
         x.addComponent(MouseHoverComponent("""
 from random import uniform
@@ -136,7 +145,7 @@ owner.getSingleComponentByType(SVAComponent).S += Vector(uniform(-100,100),unifo
         x.addComponent(Health(10))
         x.addComponent(CollisionComponent(useAABB=True))
 
-        y = tempClass3(Color.next(), self.entity_manager)
+        y = tempClass3(self.entity_manager)
         y.addComponent(SVAComponent(Vector(100,-100,0)))
         y.addComponent((MeshComponent(
         GL_TRIANGLES,
