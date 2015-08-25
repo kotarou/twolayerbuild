@@ -28,6 +28,9 @@ from util import *
 from systems import *
 from components import *
 import time
+
+from entities import *
+
 GAME_TICKS_PER_SECOND 	= 60.0
 PICK_TOLERANCE 			= 3
 PICK_BUFFER_SIZE 		= 256
@@ -116,18 +119,9 @@ class World(object):
         # Pick systems also involve rendering, but to the color picking FBO instead.
         self.system_manager.addSystem("pick", PickSystem())
 
+        x = Actor(self.entity_manager)
+        x.addComponent(MeshComponent(shape=Square(50, Vector(0, 0, 0), CENTER, [Color(255,0,255)*4], None)))
 
-
-        x = tempClass3(self.entity_manager)
-        x.addComponent(MeshComponent(
-        GL_TRIANGLES,
-            ('v3f', (0,0,0, 50,0,0, 50,50,0, 0,50,0)),
-            index=[0, 1, 2, 0, 2, 3],
-            color=('c3B', (0,0,255, 0,255,0, 255,0,0, 128,128,128))
-        ))
-        parseString = """
-print("hi!!!")
-        """
         x.addSVAComponent(Vector(10,10,0),a_velocity=Vector(0,0,1))
 
 

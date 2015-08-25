@@ -5,8 +5,6 @@
 
 from color import *
 from util import Vector
-import components
-
 
 #from ecs.models import Component, System, Entity
 #from ecs.managers import EntityManager, SystemManager

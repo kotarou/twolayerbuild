@@ -13,7 +13,7 @@ class PickSystem(System):
     def __init__(self):
         super().__init__()
 
-    def update (self, _):
+    def update(self, _):
         try:
             for e, mesh in self.eman.pairsForType(MeshComponent):
                 glLoadIdentity()

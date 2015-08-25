@@ -5,50 +5,28 @@
 from color import *
 import numpy as np
 import math
-class Shape(object):
-    def __init__(self, color=None, texture=None):
-        self.textured=False
-        if texture != None:
-            self.textured = True
-            self.texture = texture
-        self.colored = False
-        if color != None:
-            self.color = color
-            self.colored = True
+from pyglet.gl import *
 
-        if not self.colored and not self.textured:
-            raise Exception("Squares must have a color or texture")
-
-class Square(Shape):
-
-    def __init__(self, center, side, color=None, texture=None):
-        self.vertexList = [	[center[0]-side/2, center[1]-side/2, center[2]],
-                            [center[0]-side/2, (center[1]+side/2), center[2]],
-                            [(center[0]+side/2), (center[1]+side/2), center[2]],
-                            [(center[0]+side/2), center[1]-side/2, center[2]]]
-        self.indexList 	= [[0,1,2], [2,3,0]]
-        self.textureMap = [[0,0], [0, 1], [1,1], [1, 0]]
-        super().__init__(color, texture)
-
-
-class Triangle(Shape):
-
-    def __init__(self, center, side, color=None, texture=None):
-        self.vertexList = [	[center[0]-side/2, center[1]-side/2, center[2]],
-                            [center[0]-side/2, (center[1]+side/2), center[2]],
-                            [(center[0]+side/2), (center[1]+side/2), center[2]]]
-        self.indexList 	= [[0,1,2]]
-        self.textureMap = [[0,0], [0, 1], [1,1]]
-        super().__init__(color, texture)
+TOPLEFT = 0
+BOTTOMRIGHT = 1
+CENTER = 2
 
 class Vector(object):
 
     def __init__(self, x=0, y=0, z=0, w=1):
         self.array = np.array([x, y, z, w])
 
+    def __getitem__(self, index):
+        return self.array[index]
+
+    @property
+    def xyz(self):
+        return (self.array[0], self.array[1], self.array[2])
+
     @property
     def x(self):
         return self.array[0]
+
     @x.setter
     def x(self, v):
         self.array[0] = v
@@ -56,6 +34,7 @@ class Vector(object):
     @property
     def y(self):
         return self.array[1]
+
     @y.setter
     def y(self, v):
         self.array[1] = v
@@ -63,6 +42,7 @@ class Vector(object):
     @property
     def z(self):
         return self.array[2]
+
     @z.setter
     def z(self, v):
         self.array[2] = v
@@ -70,6 +50,7 @@ class Vector(object):
     @property
     def w(self):
         return self.array[3]
+
     @w.setter
     def w(self, v):
         self.array[3] = v
@@ -164,12 +145,101 @@ class Vector(object):
                      ])
         self.array = self.array.dot(rxx).dot(ryy).dot(rzz)
 
+class Square(object):
+
+    #__slots__ = ('tl', 'tr', 'bl', 'br', 'vertexList', 'indexList')
+    # NOTE: The anchor also defines the center of rotation.
+    def __init__(self,
+                 sideLength=50, position=Vector(0,0,0), anchor=TOPLEFT,
+                 colorList=None, texture=None):
+        self.tl = self.tr = self.br = self.bl = Vector(0,0,0)
+        if anchor == TOPLEFT:
+            self.tl = position
+            self.tr = position + Vector(sideLength,0,0)
+            self.bl = position + Vector(0, -sideLength, 0)
+            self.br = position + Vector(sideLength, -sideLength, 0)
+        elif anchor == BOTTOMRIGHT:
+            self.tl = position + Vector(-sideLength, sideLength, 0)
+            self.tr = position + Vector(0,sideLength,0)
+            self.bl = position + Vector(-sideLength,0, 0)
+            self.br = position
+        elif anchor == CENTER:
+            self.tl = position + Vector(-sideLength/2, sideLength/2, 0)
+            self.tr = position + Vector(sideLength/2, sideLength/2, 0)
+            self.bl = position + Vector(-sideLength/2, -sideLength/2, 0)
+            self.br = position + Vector(sideLength/2, -sideLength/2, 0)
+        else:
+            raise Exception("Unsupported square anchor")
+            #  ('v3f',
+
+        [*v] = self.bl.xyz+self.br.xyz+self.tr.xyz+self.bl.xyz+self.tr.xyz+self.tl.xyz
+
+        self.vertexList = ('v3f', tuple(v))
+        self.indexList = [0, 1, 2, 0, 2, 3]
+
+        if colorList is None:
+            self.colored = False
+            self.colorList = None
+        else:
+            self.colored = True
+            # The color list can be a tad complex.
+            # A user may be putting values in one of three formats:
+            print(colorList)
+            # 1) A single color for the entire square
+            if len(colorList) == 1 and len(colorList[0]) == 3:
+                self.colorList = [colorList[0] * 6]
+            # 2) A color for each of the 4 corners
+            elif len(colorList) == 4:
+                self.colorList = [colorList[0],colorList[1],colorList[2],colorList[3]]  # colorList[0],colorList[2],colorList[3]]
+            elif len(colorList[0]) == 12:
+                self.colorList = [colorList[0][0],colorList[0][1],colorList[0][2],
+                                  colorList[0][3],colorList[0][4],colorList[0][5],
+                                  colorList[0][6],colorList[0][7],colorList[0][8],
+                                  colorList[0][0],colorList[0][1],colorList[0][2],
+                                  colorList[0][6],colorList[0][7],colorList[0][8],
+                                  colorList[0][9],colorList[0][10],colorList[0][11]]
+            # 3) A color for each vertex
+            elif len(colorList) == 6:
+                self.colorList = colorList
+            elif len(colorList[0]) == 18:
+                self.colorList = [colorList[0][0],colorList[0][1],colorList[0][2],
+                                  colorList[0][3],colorList[0][4],colorList[0][5],
+                                  colorList[0][6],colorList[0][7],colorList[0][8],
+                                  colorList[0][9],colorList[0][10],colorList[0][11],
+                                  colorList[0][12],colorList[0][13],colorList[0][14],
+                                  colorList[0][15],colorList[0][16],colorList[0][17]]
+            else:
+                raise Exception("Unsupported number of colors")
+            try:
+                self.colorList = ('c3B', sum(self.colorList, ()))
+            except:
+                self.colorList = ('c3B', tuple(self.colorList))
+            print(self.colorList)
+
+        if texture is None:
+            self.textured = False
+            self.textureList = None
+        else:
+            self.textured = True
+            self.texture = texture
+            # This assumes that the texture is 2D and fits into the UV [0,1] range nicely
+            self.textureList = ('t2i', (0,0, 0,1, 1,1, 1,0)),
+
+        if not self.textured and not self.colored:
+            raise Exception("Cannot have an uncolored and untextured sqwuare")
+
+        self.mode = GL_TRIANGLES
+
+
 if __name__ == "__main__":
-    p = Vector(1,2,3)
-    r = Vector(1,1,1)
-    p.rotate(0, 0, 180)
-    print(p)
-    p += 2
-    print(p)
-    q = p * 3
-    print(q)
+    a = Square(50, Vector(0, 0, 0), TOPLEFT)
+    print(a)
+
+    # p = Vector(1,2,3)
+    # r = Vector(1,1,1)
+    # p.rotate(0, 0, 180)
+    # print(p)
+    # p += 2
+    # print(p)
+    # q = p * 3
+    # print(q)
