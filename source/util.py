@@ -76,7 +76,7 @@ class Vector(object):
         if len(npArray) is 4:
             return Vector(npArray[0],npArray[1],npArray[2],npArray[3])
         elif len(npArray) is 3:
-            print(npArray[2])
+            #print(npArray[2])
             return Vector(npArray[0],npArray[1],npArray[2],0 if rot else 1)
 
     def __add__(self, other):
@@ -107,6 +107,9 @@ class Vector(object):
         else:
             return Vector.fromNP(self.array / other)
 
+    def __gt__(self, other):
+        return self.length > other.length
+
     def __repr__(self):
         return self.__str__()
 
@@ -115,8 +118,18 @@ class Vector(object):
     #TODO: Interface with numpy
 
     def dot(self, other):
-        raise Exception("Vector dot method not tested.")
-        return Vector.fromNP(self.array.dot(other.array))
+        #raise Exception("Vector dot method not tested.")
+        return(self.array.dot(other.array))
+        #return Vector.fromNP(self.array.dot(other.array))
+
+    def cross(self, other):
+        #raise Exception("Vector cross method not tested.")
+       c = np.cross(self.array[0:3],other.array[0:3])
+       return Vector.fromNP(c + [1])
+
+    @property
+    def length(self):
+        return math.sqrt(self.x**2 + self.y**2 + self.z**2)
 
     def rotate(self, rx, ry, rz):
         """
@@ -176,7 +189,7 @@ class Square(object):
 
         self.vertexList = ('v3f', tuple(v))
         self.indexList = [0, 1, 2, 0, 2, 3]
-        print()
+        #print()
         if colorList is None:
             self.colored = False
             self.colorList = None
@@ -184,7 +197,7 @@ class Square(object):
             self.colored = True
             # The color list can be a tad complex.
             # A user may be putting values in one of three formats:
-            print(colorList)
+            #print(colorList)
             # 1) A single color for the entire square
             if len(colorList) == 1 and len(colorList[0]) == 3:
                 self.colorList = [colorList[0] * 6]
