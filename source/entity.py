@@ -78,7 +78,3 @@ class Component(Entity):
             Init code that requires the owner to have been specified
         """
         pass
-
-class tempClass3(Entity):
-    def __init__(self, eman):
-        super().__init__(eman)

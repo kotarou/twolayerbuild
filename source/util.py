@@ -176,7 +176,7 @@ class Square(object):
 
         self.vertexList = ('v3f', tuple(v))
         self.indexList = [0, 1, 2, 0, 2, 3]
-
+        print()
         if colorList is None:
             self.colored = False
             self.colorList = None
@@ -214,16 +214,16 @@ class Square(object):
                 self.colorList = ('c3B', sum(self.colorList, ()))
             except:
                 self.colorList = ('c3B', tuple(self.colorList))
-            print(self.colorList)
 
         if texture is None:
             self.textured = False
             self.textureList = None
+            self.texture = None
         else:
             self.textured = True
             self.texture = texture
             # This assumes that the texture is 2D and fits into the UV [0,1] range nicely
-            self.textureList = ('t2i', (0,0, 0,1, 1,1, 1,0)),
+            self.textureList = ('t2i', (0,0, 0,1, 1,1, 0,0, 1,1, 1,0))
 
         if not self.textured and not self.colored:
             raise Exception("Cannot have an uncolored and untextured sqwuare")

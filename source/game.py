@@ -121,46 +121,42 @@ class World(object):
 
         x = Actor(self.entity_manager)
         x.addComponent(MeshComponent(shape=Square(50, Vector(0, 0, 0), CENTER, [Color(255,0,255)*4], None)))
-
-        x.addSVAComponent(Vector(10,10,0),a_velocity=Vector(0,0,1))
-
-
-        x.addComponent(MouseClickComponent("Look at me, I'm red!"))
-        x.addComponent(MouseHoverComponent("""
-from random import uniform
-owner.getSingleComponentByType(SVAComponent).S += Vector(uniform(-100,100),uniform(-100,100),0)
-                       """, "Hovered!"))
-        #x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
-        x.addComponent(KeyPressComponent({
-            Key(key.A, 0): 'print("asdf")',
-            Key(key.Q, key.MOD_SHIFT, True): 'print("Yo!")'
-            }))
-        #x.addComponent(KeyHoldComponent(Key(key.B, 0), "grrrr!"))
-        x.addComponent(Health(10))
+        x.addSVAComponent(Vector(0,0,0),a_velocity=Vector(0,0,0))
         x.addComponent(CollisionComponent(useAABB=True))
 
-        y = tempClass3(self.entity_manager)
-        y.addComponent(SVAComponent(Vector(100,-100,0)))
-        y.addComponent((MeshComponent(
-        GL_TRIANGLES,
-            ('v3f', (0,0,0, 50,0,0, 50,50,0, 0,50,0)),
-            index=[0, 1, 2, 0, 2, 3],
-            textureList=('t2i', (0,0, 0,1, 1,1, 1,0)),
-            texture = textures[2],
-        )))
-        y.addComponent(MouseClickComponent("Stay away!"))
+        y = Actor(self.entity_manager)
+        y.addComponent(MeshComponent(shape=Square(50, Vector(100, 0, 0), TOPLEFT, colorList=None, texture=textures[2])))
+        y.addComponent(SVAComponent(Vector(100,0,0)))
         y.addComponent(CollisionComponent(useAABB=True))
+
+# #         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
+#         x.addComponent(MouseHoverComponent("""
+# from random import uniform
+# owner.getSingleComponentByType(SVAComponent).S += Vector(uniform(-100,100),uniform(-100,100),0)
+#                        """, "Hovered!"))
+# #         #x.addComponent(KeyPressComponent(Key(key.A, 0), "Hello!"))
+# #         x.addComponent(KeyPressComponent({
+# #             Key(key.A, 0): 'print("asdf")',
+# #             Key(key.Q, key.MOD_SHIFT, True): 'print("Yo!")'
+# #             }))
+# #         #x.addComponent(KeyHoldComponent(Key(key.B, 0), "grrrr!"))
+# #         x.addComponent(Health(10))
+
+
+
+# #         y.addComponent(MouseClickComponent("Stay away!"))
+
         y.addComponent(KeyHoldComponent({Key(key.W, 0): ["""
 owner.getSingleComponentByType(SVAComponent).S += Vector(0,1,0)
 """]}))
-        y.addComponent(KeyHoldComponent({Key(key.Q, 0): [
-"""
-owner.getSingleComponentByType(SVAComponent).V = Vector(0,1,0)
-""",
-"""
-owner.getSingleComponentByType(SVAComponent).V = Vector(0,0,0)
-"""
-]}))
+# #         y.addComponent(KeyHoldComponent({Key(key.Q, 0): [
+# # """
+# # owner.getSingleComponentByType(SVAComponent).V = Vector(0,1,0)
+# # """,
+# # """
+# # owner.getSingleComponentByType(SVAComponent).V = Vector(0,0,0)
+# # """
+# # ]}))
         y.addComponent(KeyHoldComponent({Key(key.S, 0): ["""
 owner.getSingleComponentByType(SVAComponent).S += Vector(0,-1,0)
 """]}))
@@ -170,7 +166,7 @@ owner.getSingleComponentByType(SVAComponent).S += Vector(-1,0,0)
         y.addComponent(KeyHoldComponent({Key(key.D, 0): ["""
 owner.getSingleComponentByType(SVAComponent).S += Vector(1,0,0)
 """]}))
-        # Note that higher Z = closer to camera
+#         # Note that higher Z = closer to camera
 
 
         # Can explicitly call functions on a timer
@@ -240,19 +236,16 @@ owner.getSingleComponentByType(SVAComponent).S += Vector(1,0,0)
         #     ('c3B', (0, 0, 255, 0, 255, 0, 255, 0, 0, 128, 128, 128))
         # )
         vertex_list = pyglet.graphics.vertex_list(6,
-            ('v3i', (0, 0, 0, 100,0,0, 0, 0, 0, 0,100,0, 0,0,0, 0,0,100)),
-            ('c3B', (255,255,255, 255,0,0, 255,255,255, 0,255,0, 255,255,255, 0,0,255))
+                ('v3i', (0, 0, 0, 100,0,0, 0, 0, 0, 0,100,0, 0,0,0, 0,0,100)),
+                ('c3B', (255,255,255, 255,0,0, 255,255,255, 0,255,0, 255,255,255, 0,0,255))
         )
         vertex_list.draw(pyglet.gl.GL_LINES)
-
-
-
 
         # Render the current picking frame
         # This frame is rendered in screen-space (0,0)->(game.window.width,game.window.height)
         self.fbo.attach()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glMatrixMode(GL_MODELVIEW);
+        glMatrixMode(GL_MODELVIEW)
         self.system_manager.update("pick",cTime-self.lastTime)
         self.fbo.detach()
 
@@ -263,7 +256,7 @@ class Game(object):
         keys = key.KeyStateHandler()
 
         self.world = World()
-        self.window = window.Window(WINDOW_WIDTH,WINDOW_HEIGHT, vsync=True)#fullscreen=True, vsync=True)
+        self.window = window.Window(WINDOW_WIDTH,WINDOW_HEIGHT, vsync=True)  # fullscreen=True, vsync=True)
 
         #self.window.push_handlers(pyglet.window.event.WindowEventLogger())
 
@@ -274,7 +267,6 @@ class Game(object):
         clock.set_fps_limit(60)
 
         glEnable(GL_DEPTH_TEST)
-
 
     def mainLoop(self):
         while not self.window.has_exit:
@@ -298,12 +290,12 @@ def cidFromMouse(x, y):
     # Set up storage for the pixel we click on
     aa = (GLubyte  * 3)(0)
     # Find the color of the pixel we clicked on
-    pixel = gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
+    gl.glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, aa)
 
     # Release the picking frame buffer
     game.world.fbo.detach()
     # Generate the id of the color we cllicked on
-    return  Color(aa[0], aa[1], aa[2]).toID()
+    return Color(aa[0], aa[1], aa[2]).toID()
 
 @game.window.event
 def on_mouse_press(x, y, button, modifiers):
@@ -367,8 +359,4 @@ def on_key_release(symbol, modifiers):
         if Key(symbol, modifiers) in holder.actions.keys():
             holder.active.remove(Key(symbol, modifiers))
 
-
-
 game.mainLoop()
-
-
