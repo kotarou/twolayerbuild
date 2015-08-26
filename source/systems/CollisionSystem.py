@@ -27,8 +27,8 @@ class CollisionSystem(System):
                 for e1, c1 in self.eman.pairsForType(CollisionComponent):
                     if e0 is not e1 and c1.active:
                         if c0.AABB and c1.AABB:
-                            bCollides = self.collidesWithAABB(c0, c1)
-                            #bCollides = self.collidesWithTriangles(c0, c1)
+                            #bCollides = self.collidesWithAABB(c0, c1)
+                            bCollides = self.collidesWithTriangles(c0, c1)
                         else:
                             # Triangle intersections, baby!
                             bCollides = self.collidesWithTriangles(c0, c1)
@@ -102,30 +102,55 @@ class CollisionSystem(System):
 
     def ttCollision(self, t0, t1):
         # TODO: Make this use my vectors eventually
-        # TODO: Make this check edges rather than just verticies
-        # TODO: Remove coplanar assumption
-
-        # Assume that component triangles are sufficiently large compared to their velocities
-        # Thus, for any triangle-triangle intersection
-        # A vertex wil always intersect before an edge will
-        # Note that this only works for coplaner objects
 
         # The verticies of triangle0
-        p00 = np.array(t0[0])
-        p01 = np.array(t0[1])
-        p02 = np.array(t0[2])
+        A0 = np.array(t0[0])
+        B0 = np.array(t0[1])
+        C0 = np.array(t0[2])
         # The verticies of triangle1
-        p10 = np.array(t1[0])
-        p11 = np.array(t1[1])
-        p12 = np.array(t1[2])
+        A1 = np.array(t1[0])
+        B1 = np.array(t1[1])
+        C1 = np.array(t1[2])
+
+        # Edges of triangle0
+        AB0 = A0 - B0
+        AC0 = A0 - C0
+
+        # Edges of triangle1
+        AB1 = A1 - B1
+        AC1 = A1 - C1
+        BC1 = B1 - C1
+
+        # Normal of triangle0
+        n0 = np.cross(AB0, AC0)
+
+        # t intersections for projection of triangle1 edges onto plane of triangle0
+        t0 = A1.dot(n0) - A0.dot(n0) / AB1.dot(n0)
+        # Point of intersection
+        q0 = t0*AB1 + A1
+
+        if self.pointInTriangle(A0, B0, C0, q0):
+            return True
+
+        t1 = A1.dot(n0) - A0.dot(n0) / AC1.dot(n0)
+        q1 = t1*AC1 + A1
+        if self.pointInTriangle(A0, B0, C0, q1):
+            return True
+
+        t2 = B1.dot(n0) - A0.dot(n0) / BC1.dot(n0)
+        q2 = t2*BC1 + A1
+        if self.pointInTriangle(A0, B0, C0, q2):
+            return True
+
+        # At this point, it is possible that the triangles are simply perfectly coplanar
 
         # Do any of triangle1's verticies intersect triangle0?
-        a = self.pointInTriangle(p00, p01, p02, p10)
-        b = self.pointInTriangle(p00, p01, p02, p11)
-        c = self.pointInTriangle(p00, p01, p02, p12)
+        a = self.pointInTriangle(A0, B0, C0, A1)
+        b = self.pointInTriangle(A0, B0, C0, B1)
+        c = self.pointInTriangle(A0, B0, C0, C1)
         # Do any of triangle0's verticies intersect triangle1?
-        d = self.pointInTriangle(p10, p11, p12, p00)
-        e = self.pointInTriangle(p10, p11, p12, p01)
-        f = self.pointInTriangle(p10, p11, p12, p02)
+        d = self.pointInTriangle(A1, B1, C1, A0)
+        e = self.pointInTriangle(A1, B1, C1, B0)
+        f = self.pointInTriangle(A1, B1, C1, C0)
 
         return a or b or c or d or e or f
