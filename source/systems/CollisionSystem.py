@@ -8,6 +8,8 @@ from util import Vector
 from components.CollisionComponent import CollisionComponent
 from components.MeshComponent import MeshComponent
 import time
+import numpy as np
+import math
 
 class CollisionSystem(System):
 
@@ -55,66 +57,75 @@ class CollisionSystem(System):
         return x and y and z
 
     def collidesWithTriangles(self, obj1, obj2):
-        raise Exception("Triangle - triangle collsions are not currently supported")
+        #raise Exception("Triangle - triangle collsions are not currently supported")
         tri0 = obj1.owner.getSingleComponentByType(MeshComponent).triangles
-        tri1 = obj1.owner.getSingleComponentByType(MeshComponent).triangles
-
+        tri1 = obj2.owner.getSingleComponentByType(MeshComponent).triangles
+        #print(tri0)
         for t0 in tri0:
             for t1 in tri1:
                 if self.ttCollision(t0, t1):
                     return True
         return False
 
+    def pointInTriangle(self, a, b, c, q):
+        # This assumes the point p is coplanar with the triangle (a,b,c)
+        u = b - a
+        v = c - a
+        w = q - a
+
+        vcw = np.cross(v, w)
+        vcu = np.cross(v, u)
+
+        # Sign of r
+        if vcw.dot(vcu) < 0:
+            return False
+
+        ucw = np.cross(u, w)
+        ucv = np.cross(u, v)
+
+        # Sign of t
+        if ucw.dot(ucv) < 0:
+            return False
+
+        # Both r and t > 0.
+        # Given this, as long as their sum <= 1, both are <= 1
+
+        denom = np.sqrt(ucv.dot(ucv))
+        r = np.sqrt(vcw.dot(vcw)) / denom
+        t = np.sqrt(ucw.dot(ucw)) / denom
+
+        return r + t <= 1
+
+    def normalize(self, a):
+        l = np.sqrt(a.dot(a))
+        return a / l
+
     def ttCollision(self, t0, t1):
-        p00 = Vector.fromNP(t0[1])
-        p01 = Vector.fromNP(t0[1])
-        p02 = Vector.fromNP(t0[2])
+        # TODO: Make this use my vectors eventually
+        # TODO: Make this check edges rather than just verticies
+        # TODO: Remove coplanar assumption
 
-        p10 = Vector.fromNP(t1[0])
-        p11 = Vector.fromNP(t1[1])
-        p12 = Vector.fromNP(t1[2])
+        # Assume that component triangles are sufficiently large compared to their velocities
+        # Thus, for any triangle-triangle intersection
+        # A vertex wil always intersect before an edge will
+        # Note that this only works for coplaner objects
 
-        b0 = (p00 + p01 + p02) / 3
-        b1 = (p10 + p11 + p12) / 3
+        # The verticies of triangle0
+        p00 = np.array(t0[0])
+        p01 = np.array(t0[1])
+        p02 = np.array(t0[2])
+        # The verticies of triangle1
+        p10 = np.array(t1[0])
+        p11 = np.array(t1[1])
+        p12 = np.array(t1[2])
 
-        e10 = p10 - p11
-        e11 = p10 - p12
-        e12 = p11 - p12
+        # Do any of triangle1's verticies intersect triangle0?
+        a = self.pointInTriangle(p00, p01, p02, p10)
+        b = self.pointInTriangle(p00, p01, p02, p11)
+        c = self.pointInTriangle(p00, p01, p02, p12)
+        # Do any of triangle0's verticies intersect triangle1?
+        d = self.pointInTriangle(p10, p11, p12, p00)
+        e = self.pointInTriangle(p10, p11, p12, p01)
+        f = self.pointInTriangle(p10, p11, p12, p02)
 
-        e00 = p00 - p01
-        e01 = p00 - p02
-        e02 = p01 - p02
-
-        e0 = ((e00 + e01 + e02) / 3).length
-        e1 = ((e10 + e11 + e12) / 3).length
-
-        print((b0-b1).length)
-        return (b0-b1).length > e0+e1
-
-        # e10 = p10 - p11
-        # e11 = p10 - p12
-        # e12 = p11 - p12
-
-        # n0 = (p01 - p00).cross(p02 - p00)
-        # n1 = (p11 - p10).cross(p12 - p10)
-        # #print("nnn", n0, n1)
-        # t0 = (p10 - p00).dot(n0) / e10.dot(n0)
-        # t1 = (p10 - p00).dot(n0) / e11.dot(n0)
-        # t2 = (p10 - p00).dot(n0) / e12.dot(n0)
-
-        # print("a", t0, t1, t2)
-        return False
-        # if abs(n0.cross(n1).length) < 0.005:
-        #     # They are parallel
-
-
-
-
-
-
-
-
-
-
-
-
+        return a or b or c or d or e or f

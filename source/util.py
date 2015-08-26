@@ -124,8 +124,13 @@ class Vector(object):
 
     def cross(self, other):
         #raise Exception("Vector cross method not tested.")
-       c = np.cross(self.array[0:3],other.array[0:3])
-       return Vector.fromNP(c + [1])
+        c = np.cross(self.array[0:3],other.array[0:3])
+        #print('c', c)
+        return Vector.fromNP(c + [1])
+
+    def normalise(self):
+        l = self.length
+        return Vector(self.x / l, self.y / l, self.z / l)
 
     @property
     def length(self):
