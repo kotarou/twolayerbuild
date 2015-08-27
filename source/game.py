@@ -122,12 +122,21 @@ class World(object):
         x = Actor(self.entity_manager)
         x.addComponent(MeshComponent(shape=Square(50, Vector(0, 0, 0), CENTER, [Color(255,0,255)*4], None)))
         x.addSVAComponent(Vector(0,0,0),a_velocity=Vector(0,0,0))
-        x.addComponent(CollisionComponent(useAABB=True))
+        x.addComponent(CollisionComponent(useAABB=True, type_="thing", typeCollide=["thing","ground"]))
 
         y = Actor(self.entity_manager)
         y.addComponent(MeshComponent(shape=Square(50, Vector(100, 0, 0), TOPLEFT, colorList=None, texture=textures[2])))
         y.addComponent(SVAComponent(Vector(100,0,0)))
-        y.addComponent(CollisionComponent(useAABB=True))
+        y.addComponent(CollisionComponent(useAABB=True, type_="thing", typeCollide=["thing","ground"]))
+
+        listOfThings = []
+        for i in range (0, 16):
+            a = Actor(self.entity_manager)
+            a.addComponent(MeshComponent(shape=Square(50, Vector(0,0,0), TOPLEFT, colorList=[Color(255,255,255)*4])))
+            a.addComponent(SVAComponent(Vector(-400+(50*i), -100, 0)))
+            a.addComponent(CollisionComponent(useAABB=False, type_="ground", typeCollide=["thing"]))
+            listOfThings.append(a)
+
 
 # #         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
 #         x.addComponent(MouseHoverComponent("""

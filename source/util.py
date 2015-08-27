@@ -55,6 +55,10 @@ class Vector(object):
     def w(self, v):
         self.array[3] = v
 
+    @property
+    def length(self):
+        return np.sqrt(self.array[0:3].dot(self.array[0:3]))
+
     def angleWrap(self):
         if self.x > 360:
             self.x -= 360
@@ -131,10 +135,6 @@ class Vector(object):
     def normalise(self):
         l = self.length
         return Vector(self.x / l, self.y / l, self.z / l)
-
-    @property
-    def length(self):
-        return math.sqrt(self.x**2 + self.y**2 + self.z**2)
 
     def rotate(self, rx, ry, rz):
         """

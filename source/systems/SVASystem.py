@@ -25,18 +25,21 @@ class SVASystem(System):
             dS = sva.S - sva.oldS
             #print("dS", dS)
 
-            for mesh in e.getComponentsByType(MeshComponent):
-                for triangle in mesh.triangles:
-                    #print("aaaaaaaaaa", triangle)
-                    triangle[0][0] += dS[0]
-                    triangle[0][1] += dS[1]
-                    triangle[0][2] += dS[2]
-                    triangle[1][0] += dS[0]
-                    triangle[1][1] += dS[1]
-                    triangle[1][2] += dS[2]
-                    triangle[2][0] += dS[0]
-                    triangle[2][1] += dS[1]
-                    triangle[2][2] += dS[2]
+            if sva.A.length > 0 or sva.V.length > 0 or dS.length > 0:
+                #print(sva.A, sva.V, dS)
+                for mesh in e.getComponentsByType(MeshComponent):
+                    for triangle in mesh.triangles:
+                        #print("aaaaaaaaaa", triangle)
+                        triangle[0][0] += dS[0]
+                        triangle[0][1] += dS[1]
+                        triangle[0][2] += dS[2]
+                        triangle[1][0] += dS[0]
+                        triangle[1][1] += dS[1]
+                        triangle[1][2] += dS[2]
+                        triangle[2][0] += dS[0]
+                        triangle[2][1] += dS[1]
+                        triangle[2][2] += dS[2]
+                        mesh.updateBary()
                     #print("bbbbbbbbbb", triangle)
 
             # Linear

@@ -20,21 +20,22 @@ class CollisionSystem(System):
         # First, update for changes in SVA
         for e, c in self.eman.pairsForType(CollisionComponent):
             if c.AABB:
-                self.newAABB(c, e)
+                 self.newAABB(c, e)
 
         for e0, c0 in self.eman.pairsForType(CollisionComponent):
             if c0.active:
                 for e1, c1 in self.eman.pairsForType(CollisionComponent):
-                    if e0 is not e1 and c1.active:
+                    if e0 is not e1 and c1.active and c1.type_ in c0.typeCollide:
                         if c0.AABB and c1.AABB:
-                            #bCollides = self.collidesWithAABB(c0, c1)
-                            bCollides = self.collidesWithTriangles(c0, c1)
+                            bCollides = self.collidesWithAABB(c0, c1)
+                            #bCollides = self.collidesWithTriangles(c0, c1)
                         else:
                             # Triangle intersections, baby!
                             bCollides = self.collidesWithTriangles(c0, c1)
                         if bCollides:
                             print(e0, " collides with ", e1)
                             print(int(round(time.time() * 1000)))
+
 
     def newAABB(self, obj, owner):
         obj.tl = Vector(99999, -9999, -999999)
@@ -58,14 +59,34 @@ class CollisionSystem(System):
 
     def collidesWithTriangles(self, obj1, obj2):
         #raise Exception("Triangle - triangle collsions are not currently supported")
-        tri0 = obj1.owner.getSingleComponentByType(MeshComponent).triangles
-        tri1 = obj2.owner.getSingleComponentByType(MeshComponent).triangles
+        m0 = obj1.owner.getSingleComponentByType(MeshComponent)
+        m1 = obj2.owner.getSingleComponentByType(MeshComponent)
+        tri0 = m0.triangles
+        tri1 = m1.triangles
+
         #print(tri0)
         for t0 in tri0:
             for t1 in tri1:
-                if self.ttCollision(t0, t1):
-                    return True
+                if self.length(m0.bary - m1.bary) <= m0.radius + m1.radius:
+                    if self.ttCollision(t0, t1):
+                        return True
         return False
+
+    # def lineIntersectLine(self, a0, b0, a1, b1):
+    #     # Two lines defined by points (a0, a1) and (b0, b1)
+    #     # raise Exception("This methos is untested")
+    #     det = np.array([
+    #                  [a0[0], a0[1], a0[2], 1],
+    #                  [a1[0], a1[1], a1[2], 1],
+    #                  [b0[0], b0[1], b0[2], 1],
+    #                  [b1[0], b1[1], b1[2], 1]
+    #                  ])
+    #     x = np.linalg.det(det)
+    #     print(x)
+    #     return x == 0.
+
+    def length(self, a):
+        return np.sqrt(a.dot(a))
 
     def pointInTriangle(self, a, b, c, q):
         # This assumes the point p is coplanar with the triangle (a,b,c)
@@ -143,14 +164,36 @@ class CollisionSystem(System):
             return True
 
         # At this point, it is possible that the triangles are simply perfectly coplanar
-
+        # # Do any of tri1's edges cross an edge of tri0?
+        # a = self.lineIntersectLine(A0, B0, A1, B1)
+        # b = self.lineIntersectLine(A0, B0, A1, C1)
+        # c = self.lineIntersectLine(A0, B0, B1, C1)
+        # d = self.lineIntersectLine(A0, C0, A1, B1)
+        # e = self.lineIntersectLine(A0, C0, A1, C1)
+        # f = self.lineIntersectLine(A0, C0, B1, C1)
+        # g = self.lineIntersectLine(B0, C0, A1, B1)
+        # h = self.lineIntersectLine(B0, C0, A1, C1)
+        # i = self.lineIntersectLine(B0, C0, B1, C1)
+        # return a or b or c or d or e or f or g or h or i
         # Do any of triangle1's verticies intersect triangle0?
         a = self.pointInTriangle(A0, B0, C0, A1)
+        if a:
+            return True
         b = self.pointInTriangle(A0, B0, C0, B1)
+        if b:
+            return True
         c = self.pointInTriangle(A0, B0, C0, C1)
+        if c:
+            return True
         # Do any of triangle0's verticies intersect triangle1?
         d = self.pointInTriangle(A1, B1, C1, A0)
+        if d:
+            return True
         e = self.pointInTriangle(A1, B1, C1, B0)
+        if e:
+            return True
         f = self.pointInTriangle(A1, B1, C1, C0)
+        if f:
+            return True
 
-        return a or b or c or d or e or f
+        return False

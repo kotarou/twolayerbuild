@@ -12,7 +12,7 @@ from pyglet.gl import *
 class CollisionComponent(Component):
 
     #def __init__(self, *args, **kwargs):
-    def __init__(self, useAABB=False, AABB=None, collidable=True):
+    def __init__(self, type_, typeCollide, useAABB=False, AABB=None, collidable=True):
         super().__init__()
         self.tl = Vector(0,0,0)
         self.br = Vector(0,0,0)
@@ -23,7 +23,8 @@ class CollisionComponent(Component):
         else:
             self.setUp = False
             self.AABB = useAABB
-
+        self.type_ = type_
+        self.typeCollide = typeCollide
         self.active = collidable
         # if 'collidable' in kwargs.keys():
         #     self.active = True
@@ -46,12 +47,13 @@ class CollisionComponent(Component):
 
         elif not self.setUp:
             # Don't use an AABB
-            raise Exception("Collisions only work with AABB for now")
+            self.triangles = True
 
         else:
             # Do this with the triangles
             # SUPER SLOW
-            raise Exception("Collisions only work with AABB for now")
+            self.triangles = True
+
 
 
 
