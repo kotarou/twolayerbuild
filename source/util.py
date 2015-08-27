@@ -163,29 +163,32 @@ class Vector(object):
                      ])
         self.array = self.array.dot(rxx).dot(ryy).dot(rzz)
 
-class Square(object):
+class Shape(object):
+    def __init__(self):
+        pass
 
-    #__slots__ = ('tl', 'tr', 'bl', 'br', 'vertexList', 'indexList')
-    # NOTE: The anchor also defines the center of rotation.
+class Rectangle(Shape):
     def __init__(self,
-                 sideLength=50, position=Vector(0,0,0), anchor=TOPLEFT,
+                 width=50, height=50,
+                 position=Vector(0,0,0), anchor=TOPLEFT,
                  colorList=None, texture=None):
+    # NOTE: The anchor also defines the center of rotation.
         self.tl = self.tr = self.br = self.bl = Vector(0,0,0)
         if anchor == TOPLEFT:
             self.tl = position
-            self.tr = position + Vector(sideLength,0,0)
-            self.bl = position + Vector(0, -sideLength, 0)
-            self.br = position + Vector(sideLength, -sideLength, 0)
+            self.tr = position + Vector(width,0,0)
+            self.bl = position + Vector(0, -height, 0)
+            self.br = position + Vector(width, -height, 0)
         elif anchor == BOTTOMRIGHT:
-            self.tl = position + Vector(-sideLength, sideLength, 0)
-            self.tr = position + Vector(0,sideLength,0)
-            self.bl = position + Vector(-sideLength,0, 0)
+            self.tl = position + Vector(-width, height, 0)
+            self.tr = position + Vector(0,height,0)
+            self.bl = position + Vector(-width,0, 0)
             self.br = position
         elif anchor == CENTER:
-            self.tl = position + Vector(-sideLength/2, sideLength/2, 0)
-            self.tr = position + Vector(sideLength/2, sideLength/2, 0)
-            self.bl = position + Vector(-sideLength/2, -sideLength/2, 0)
-            self.br = position + Vector(sideLength/2, -sideLength/2, 0)
+            self.tl = position + Vector(-width/2, height/2, 0)
+            self.tr = position + Vector(width/2, height/2, 0)
+            self.bl = position + Vector(-width/2, -height/2, 0)
+            self.br = position + Vector(width/2, -height/2, 0)
         else:
             raise Exception("Unsupported square anchor")
             #  ('v3f',
@@ -247,6 +250,16 @@ class Square(object):
             raise Exception("Cannot have an uncolored and untextured sqwuare")
 
         self.mode = GL_TRIANGLES
+
+
+class Square(Rectangle):
+
+    #__slots__ = ('tl', 'tr', 'bl', 'br', 'vertexList', 'indexList')
+    # NOTE: The anchor also defines the center of rotation.
+    def __init__(self,
+                 sideLength=50, position=Vector(0,0,0), anchor=TOPLEFT,
+                 colorList=None, texture=None):
+                super().__init__(sideLength, sideLength, position, anchor, colorList, texture)
 
 
 if __name__ == "__main__":

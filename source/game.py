@@ -137,6 +137,10 @@ class World(object):
             a.addComponent(CollisionComponent(useAABB=False, type_="ground", typeCollide=["thing"]))
             listOfThings.append(a)
 
+        a = Actor(self.entity_manager)
+        a.addComponent(MeshComponent(shape=Rectangle(500, 50, Vector(0,0,0), TOPLEFT, colorList=[Color(255,255,0)*4])))
+        a.addComponent(SVAComponent(Vector(-400, 200, 0)))
+        a.addComponent(CollisionComponent(useAABB=True, type_="ground", typeCollide=["thing"]))
 
 # #         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
 #         x.addComponent(MouseHoverComponent("""
