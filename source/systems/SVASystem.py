@@ -42,9 +42,8 @@ class SVASystem(System):
                         triangle[2][0] += dS[0]
                         triangle[2][1] += dS[1]
                         triangle[2][2] += dS[2]
-                        #print(sva.ALPHA, sva.OMEGA, sva.THETA)
+                        print(triangle)
                         if sva.OMEGA.length > 0 or sva.ALPHA.length > 0:
-                            #print("hiiiiiiiiiiiiiiiii")
                             x = triangle[0][0]
                             y = triangle[0][1]
                             triangle[0][0] = (x - h)*math.cos(sva.THETA[2]) - (y - k)*math.sin(sva.THETA[2]) + h
@@ -59,6 +58,7 @@ class SVASystem(System):
                             y = triangle[2][1]
                             triangle[2][0] = (x - h)*math.cos(sva.THETA[2]) - (y - k)*math.sin(sva.THETA[2]) + h
                             triangle[2][1] = (x - h)*math.sin(sva.THETA[2]) + (y - k)*math.cos(sva.THETA[2]) + k
+                        print(triangle)
 
                         mesh.updateBary()
                     #print("bbbbbbbbbb", triangle)

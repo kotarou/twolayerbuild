@@ -54,6 +54,11 @@ class CollisionComponent(Component):
             # SUPER SLOW
             self.triangles = True
 
+    def collide(self, type_):
+        # Respond to collisions
+        # if self.type_ == "limb" and type_ == "ground":
+        pass
+
 
 
 

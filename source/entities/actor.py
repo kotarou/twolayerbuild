@@ -12,7 +12,7 @@ class Limb(Entity):
         super().__init__(eman)
 
         self.addComponent(mesh)
-        self.addComponent(CollisionComponent("limb", ["weapon"], useAABB=False, AABB=None, collidable=True))
+        self.addComponent(CollisionComponent("limb", ["weapon","ground"], useAABB=False, AABB=None, collidable=True))
         self.addComponent(SVAComponent())
 
 
@@ -49,7 +49,7 @@ class Actor(Entity):
 
         self.addComponent(KeyHoldComponent({Key(key.Q, 0): [
 """
-owner.larm.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,1)
+owner.larm.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,3)
 """,
 """
 owner.larm.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,0)
@@ -57,7 +57,7 @@ owner.larm.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,0)
 ]}))
         self.addComponent(KeyHoldComponent({Key(key.W, 0): [
 """
-owner.rarm.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,1)
+owner.rarm.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,3)
 """,
 """
 owner.rarm.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,0)
@@ -65,7 +65,7 @@ owner.rarm.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,0)
 ]}))
         self.addComponent(KeyHoldComponent({Key(key.A, 0): [
 """
-owner.lleg.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,1)
+owner.lleg.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,3)
 """,
 """
 owner.lleg.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,0)
@@ -73,7 +73,7 @@ owner.lleg.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,0)
 ]}))
         self.addComponent(KeyHoldComponent({Key(key.S, 0): [
 """
-owner.rleg.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,1)
+owner.rleg.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,3)
 """,
 """
 owner.rleg.getSingleComponentByType(SVAComponent).OMEGA = Vector(0,0,0)

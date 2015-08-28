@@ -32,10 +32,9 @@ class CollisionSystem(System):
                             # Triangle intersections, baby!
                             bCollides = self.collidesWithTriangles(c0, c1)
                         if bCollides:
-                            s = e0.getSingleComponentByType(SVAComponent)
-                            s.A = Vector(x=0, y=1, z=0, w=1)
-                            print(e0, " collides with ", e1)
-                            print(int(round(time.time() * 1000)))
+                            c0.collide(c1.type_)
+                            #print(e0, "(type)", c0.type_, " collides with ", e1, "(type)", c1.type_, )
+                            #print(int(round(time.time() * 1000)))
 
 
     def newAABB(self, obj, owner):

@@ -139,7 +139,7 @@ class World(object):
         ground = Entity(self.entity_manager)
         ground.addComponent(MeshComponent(shape=Rectangle(800, 50, Vector(0,0,0), TOPLEFT, colorList=[Color(255,255,0)*4])))
         ground.addComponent(SVAComponent(Vector(-400, -200, 0)))
-        ground.addComponent(CollisionComponent(useAABB=True, type_="ground", typeCollide=["thing"]))
+        ground.addComponent(CollisionComponent(useAABB=True, type_="ground", typeCollide=["limb"]))
 
         p1Avatar = Actor(self.entity_manager)
         p1Avatar.addSVAComponent(position=Vector(-350, -190, 0), bounded=True)
@@ -252,11 +252,11 @@ class World(object):
         #              100, 150, 0)),
         #     ('c3B', (0, 0, 255, 0, 255, 0, 255, 0, 0, 128, 128, 128))
         # )
-        vertex_list = pyglet.graphics.vertex_list(2,
-                ('v3i', (0, 0, 0, 20,100,0)),
-                ('c3B', (255,255,255, 255,0,0))
-        )
-        vertex_list.draw(pyglet.gl.GL_LINES)
+        # vertex_list = pyglet.graphics.vertex_list(2,
+        #         ('v3i', (0, 0, 0, 20,100,0)),
+        #         ('c3B', (255,255,255, 255,0,0))
+        # )
+        # vertex_list.draw(pyglet.gl.GL_LINES)
         v2 = pyglet.graphics.vertex_list(6,
                 ('v3i', (0, 0, 0, 100,0,0, 0, 0, 0, 0,100,0, 0,0,0, 0,0,100)),
                 ('c3B', (255,255,255, 255,0,0, 255,255,255, 0,255,0, 255,255,255, 0,0,255))
