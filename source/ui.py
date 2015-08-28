@@ -23,13 +23,13 @@ class ui:
         x = Actor(game.world.EntityManager)
 
         x.addComponent(meshComponentIn)
+        x.addComponent(UIComponent)
+        x.addComponent(KeyPressComponent(if(owner.isActive() and owner.isVisible()):({key(key.UP, 0): [owner.getNextUIActor().setActive()]})))) # moves to the above menu element
+        x.addComponent(KeyPressComponent(if(owner.isActive() and owner.isVisible()):({key(key.DOWN, 0): [owner.getPreviousUIActor().setActive()]}))) # moves to the below menu element
+        x.addComponent(KeyPressComponent(if(owner.isActive() and owner.isVisible()):({key(key.ENTER, 0): [owner.activate()]}))) # do stuff to this element (keyboard)
 
-        x.addComponent(KeyPressComponent(if(owner.isActive):({key(key.UP, 0): [owner.getNextUIActor().setActive()]})))) # moves to the above menu element
-        x.addComponent(KeyPressComponent(if(owner.isActive):({key(key.DOWN, 0): [owner.getPreviousUIActor().setActive()]}))) # moves to the below menu element
-        x.addComponent(KeyPressComponent(if(owner.isActive):({key(key.ENTER, 0): [owner.activate()]}))) # do stuff to this element (keyboard)
-
-        x.addComponent(MouseClickComponent()) # do stuff to this element (mouse)
-        x.addComponent(MouseHoverComponent() # moves to the hovered element
+        x.addComponent(MouseClickComponent(if(owner.isActive() and owner.isVisible()): owner.activate())) # do stuff to this element (mouse)
+        x.addComponent(MouseHoverComponent(if(owner.isVisible() and owner.isVisible()): owner.setActive()) # moves to the hovered element
 
         self.uiActorDict.append(x)
 

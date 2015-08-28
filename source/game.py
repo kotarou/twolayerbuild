@@ -5,7 +5,7 @@
 from pyglet import *
 from pyglet.gl import *
 from fbo import *
-from ecs.exceptions import *
+#from ecs.exceptions import *
 import numpy as np
 
 from managers import *
