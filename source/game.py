@@ -90,6 +90,13 @@ class World(object):
         self.mousePosition = (0,0)
         self.mouseMovement = (0,0)
         # load the example texture
+       
+
+        crown_file = pyglet.image.load('resources/crownrb.png')
+        #crown_image = (crown_file.get_region(x=0, y=0, width=30, height=30))
+        crown_texture = crown_file.get_texture()
+        #crown_texture = crown_texture.get_transform(90)
+
         tile_file = pyglet.image.load('resources/floor_tiles.png')
         sections = []
         textures = []
@@ -125,7 +132,7 @@ class World(object):
         x.addComponent(CollisionComponent(useAABB=True, type_="thing", typeCollide=["thing","ground"]))
 
         y = Actor(self.entity_manager)
-        y.addComponent(MeshComponent(shape=Square(50, Vector(100, 0, 0), TOPLEFT, colorList=None, texture=textures[2])))
+        y.addComponent(MeshComponent(shape=Square(60, Vector(100, 0, 0), TOPLEFT, colorList=None, texture=crown_texture)))
         y.addComponent(SVAComponent(Vector(100,0,0)))
         y.addComponent(CollisionComponent(useAABB=True, type_="thing", typeCollide=["thing","ground"]))
 
@@ -138,7 +145,8 @@ class World(object):
             listOfThings.append(a)
 
         a = Actor(self.entity_manager)
-        a.addComponent(MeshComponent(shape=Rectangle(500, 50, Vector(0,0,0), TOPLEFT, colorList=[Color(255,255,0)*4])))
+        a.addComponent(MeshComponent(shape=Rectangle(24, 15, Vector(0,0,0), TOPLEFT, colorList=None, texture=crown_texture)))
+
         a.addComponent(SVAComponent(Vector(-400, 200, 0)))
         a.addComponent(CollisionComponent(useAABB=True, type_="ground", typeCollide=["thing"]))
 
