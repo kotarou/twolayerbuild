@@ -5,8 +5,7 @@
 
 from entity import System
 from util import Vector
-from components.CollisionComponent import CollisionComponent
-from components.MeshComponent import MeshComponent
+from components import *
 import time
 import numpy as np
 import math
@@ -33,6 +32,8 @@ class CollisionSystem(System):
                             # Triangle intersections, baby!
                             bCollides = self.collidesWithTriangles(c0, c1)
                         if bCollides:
+                            s = e0.getSingleComponentByType(SVAComponent)
+                            s.A = Vector(x=0, y=1, z=0, w=1)
                             print(e0, " collides with ", e1)
                             print(int(round(time.time() * 1000)))
 
