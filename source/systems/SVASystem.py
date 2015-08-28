@@ -7,6 +7,7 @@ from entity import System
 from components.SVAComponent import SVAComponent
 from components.CollisionComponent import CollisionComponent
 from components.MeshComponent import MeshComponent
+import math
 
 # TODO, get these from main game instead of hard coding
 WINDOW_WIDTH            = 800
@@ -25,11 +26,13 @@ class SVASystem(System):
             dS = sva.S - sva.oldS
             #print("dS", dS)
 
-            if sva.A.length > 0 or sva.V.length > 0 or dS.length > 0:
-                #print(sva.A, sva.V, dS)
+            if sva.A.length > 0 or sva.V.length > 0 or dS.length > 0 or sva.OMEGA.length > 0 or sva.ALPHA.length > 0:
                 for mesh in e.getComponentsByType(MeshComponent):
+                    mesh.anchor += dS
+                    print(mesh.anchor)
                     for triangle in mesh.triangles:
-                        #print("aaaaaaaaaa", triangle)
+                        h = mesh.anchor[0]
+                        k = mesh.anchor[1]
                         triangle[0][0] += dS[0]
                         triangle[0][1] += dS[1]
                         triangle[0][2] += dS[2]
@@ -39,6 +42,24 @@ class SVASystem(System):
                         triangle[2][0] += dS[0]
                         triangle[2][1] += dS[1]
                         triangle[2][2] += dS[2]
+                        #print(sva.ALPHA, sva.OMEGA, sva.THETA)
+                        if sva.OMEGA.length > 0 or sva.ALPHA.length > 0:
+                            #print("hiiiiiiiiiiiiiiiii")
+                            x = triangle[0][0]
+                            y = triangle[0][1]
+                            triangle[0][0] = (x - h)*math.cos(sva.THETA[2]) - (y - k)*math.sin(sva.THETA[2]) + h
+                            triangle[0][1] = (x - h)*math.sin(sva.THETA[2]) + (y - k)*math.cos(sva.THETA[2]) + k
+
+                            x = triangle[1][0]
+                            y = triangle[1][1]
+                            triangle[1][0] = (x - h)*math.cos(sva.THETA[2]) - (y - k)*math.sin(sva.THETA[2]) + h
+                            triangle[1][1] = (x - h)*math.sin(sva.THETA[2]) + (y - k)*math.cos(sva.THETA[2]) + k
+
+                            x = triangle[2][0]
+                            y = triangle[2][1]
+                            triangle[2][0] = (x - h)*math.cos(sva.THETA[2]) - (y - k)*math.sin(sva.THETA[2]) + h
+                            triangle[2][1] = (x - h)*math.sin(sva.THETA[2]) + (y - k)*math.cos(sva.THETA[2]) + k
+
                         mesh.updateBary()
                     #print("bbbbbbbbbb", triangle)
 

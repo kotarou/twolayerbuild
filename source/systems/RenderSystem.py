@@ -19,9 +19,11 @@ class RenderSystem(System):
             glLoadIdentity()
             for sva in self.eman.componentByType(e, SVAComponent):
                 glTranslatef(sva.S.x,sva.S.y,sva.S.z)
+                glTranslatef(mesh.anchor.x,mesh.anchor.y,mesh.anchor.z)
                 glRotatef(sva.THETA.x,1,0,0)
                 glRotatef(sva.THETA.y,0,1,0)
                 glRotatef(sva.THETA.z,0,0,1)
+                glTranslatef(-mesh.anchor.x,-mesh.anchor.y,-mesh.anchor.z)
             vList = pyglet.graphics.vertex_list(
                     mesh.numVert,
                     #('v2i', (5,10, 15,20, 25,30, 35,40, 45,50, 55,60 )),

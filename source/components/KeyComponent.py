@@ -8,6 +8,7 @@ from pyglet.window import key
 from collections import namedtuple
 from .HealthComponent import Health
 from .SVAComponent import SVAComponent
+from .MeshComponent import MeshComponent
 from util import Vector
 
 class Key(namedtuple('__KeyCombination', 'symbol modifiers modMatters')):
@@ -57,6 +58,7 @@ class KeyComponent(Component):
         d["eman"] = x.eman
         d["owner"] = x
         d["SVAComponent"] = SVAComponent
+        d["MeshComponent"] = MeshComponent
         d["Vector"] = Vector
         exec(input, globals(), d)
 

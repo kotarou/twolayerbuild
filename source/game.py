@@ -5,7 +5,6 @@
 from pyglet import *
 from pyglet.gl import *
 from fbo import *
-from ecs.exceptions import *
 import numpy as np
 
 from managers import *
@@ -119,28 +118,33 @@ class World(object):
         # Pick systems also involve rendering, but to the color picking FBO instead.
         self.system_manager.addSystem("pick", PickSystem())
 
-        x = Actor(self.entity_manager)
-        x.addComponent(MeshComponent(shape=Square(50, Vector(0, 0, 0), CENTER, [Color(255,0,255)*4], None)))
-        x.addSVAComponent(Vector(0,0,0),a_velocity=Vector(0,0,0))
-        x.addComponent(CollisionComponent(useAABB=True, type_="thing", typeCollide=["thing","ground"]))
+        # x = Entity(self.entity_manager)
+        # x.addComponent(MeshComponent(shape=Square(50, Vector(0, 0, 0), CENTER, [Color(255,0,255)*4], None)))
+        # x.addComponent(SVAComponent(Vector(0,0,0),a_velocity=Vector(0,0,0)))
+        # x.addComponent(CollisionComponent(useAABB=True, type_="thing", typeCollide=["thing","ground"]))
 
-        y = Actor(self.entity_manager)
-        y.addComponent(MeshComponent(shape=Square(50, Vector(100, 0, 0), TOPLEFT, colorList=None, texture=textures[2])))
-        y.addComponent(SVAComponent(Vector(100,0,0)))
-        y.addComponent(CollisionComponent(useAABB=True, type_="thing", typeCollide=["thing","ground"]))
+        # y = Entity(self.entity_manager)
+        # y.addComponent(MeshComponent(shape=Square(50, Vector(100, 0, 0), TOPLEFT, colorList=None, texture=textures[2])))
+        # y.addComponent(SVAComponent(Vector(100,0,0)))
+        # y.addComponent(CollisionComponent(useAABB=True, type_="thing", typeCollide=["thing","ground"]))
 
-        listOfThings = []
-        for i in range (0, 16):
-            a = Actor(self.entity_manager)
-            a.addComponent(MeshComponent(shape=Square(50, Vector(0,0,0), TOPLEFT, colorList=[Color(255,255,255)*4])))
-            a.addComponent(SVAComponent(Vector(-400+(50*i), -100, 0)))
-            a.addComponent(CollisionComponent(useAABB=False, type_="ground", typeCollide=["thing"]))
-            listOfThings.append(a)
+        # listOfThings = []
+        # for i in range (0, 16):
+        #     a = Entity(self.entity_manager)
+        #     a.addComponent(MeshComponent(shape=Square(50, Vector(0,0,0), TOPLEFT, colorList=[Color(255,255,255)*4])))
+        #     a.addComponent(SVAComponent(Vector(-400+(50*i), -100, 0)))
+        #     a.addComponent(CollisionComponent(useAABB=False, type_="ground", typeCollide=["thing"]))
+        #     listOfThings.append(a)
 
-        a = Actor(self.entity_manager)
-        a.addComponent(MeshComponent(shape=Rectangle(500, 50, Vector(0,0,0), TOPLEFT, colorList=[Color(255,255,0)*4])))
-        a.addComponent(SVAComponent(Vector(-400, 200, 0)))
-        a.addComponent(CollisionComponent(useAABB=True, type_="ground", typeCollide=["thing"]))
+        ground = Entity(self.entity_manager)
+        ground.addComponent(MeshComponent(shape=Rectangle(800, 50, Vector(0,0,0), TOPLEFT, colorList=[Color(255,255,0)*4])))
+        ground.addComponent(SVAComponent(Vector(-400, -200, 0)))
+        ground.addComponent(CollisionComponent(useAABB=True, type_="ground", typeCollide=["thing"]))
+
+        p1Avatar = Actor(self.entity_manager)
+        p1Avatar.addSVAComponent(position=Vector(-350, -190, 0), bounded=True)
+        p2Avatar = Actor(self.entity_manager)
+        p2Avatar.addSVAComponent(position=Vector(350, -190, 0), bounded=True)
 
 # #         x.addComponent(MouseClickComponent("Look at me, I'm red!"))
 #         x.addComponent(MouseHoverComponent("""
@@ -157,29 +161,29 @@ class World(object):
 
 
 
-# #         y.addComponent(MouseClickComponent("Stay away!"))
+# # #         y.addComponent(MouseClickComponent("Stay away!"))
 
-        y.addComponent(KeyHoldComponent({Key(key.W, 0): ["""
-owner.getSingleComponentByType(SVAComponent).S += Vector(0,1,0)
-"""]}))
-# #         y.addComponent(KeyHoldComponent({Key(key.Q, 0): [
-# # """
-# # owner.getSingleComponentByType(SVAComponent).V = Vector(0,1,0)
-# # """,
-# # """
-# # owner.getSingleComponentByType(SVAComponent).V = Vector(0,0,0)
-# # """
-# # ]}))
-        y.addComponent(KeyHoldComponent({Key(key.S, 0): ["""
-owner.getSingleComponentByType(SVAComponent).S += Vector(0,-1,0)
-"""]}))
-        y.addComponent(KeyHoldComponent({Key(key.A, 0): ["""
-owner.getSingleComponentByType(SVAComponent).S += Vector(-1,0,0)
-"""]}))
-        y.addComponent(KeyHoldComponent({Key(key.D, 0): ["""
-owner.getSingleComponentByType(SVAComponent).S += Vector(1,0,0)
-"""]}))
-#         # Note that higher Z = closer to camera
+#         y.addComponent(KeyHoldComponent({Key(key.W, 0): ["""
+# owner.getSingleComponentByType(SVAComponent).S += Vector(0,1,0)
+# """]}))
+# # #         y.addComponent(KeyHoldComponent({Key(key.Q, 0): [
+# # # """
+# # # owner.getSingleComponentByType(SVAComponent).V = Vector(0,1,0)
+# # # """,
+# # # """
+# # # owner.getSingleComponentByType(SVAComponent).V = Vector(0,0,0)
+# # # """
+# # # ]}))
+#         y.addComponent(KeyHoldComponent({Key(key.S, 0): ["""
+# owner.getSingleComponentByType(SVAComponent).S += Vector(0,-1,0)
+# """]}))
+#         y.addComponent(KeyHoldComponent({Key(key.A, 0): ["""
+# owner.getSingleComponentByType(SVAComponent).S += Vector(-1,0,0)
+# """]}))
+#         y.addComponent(KeyHoldComponent({Key(key.D, 0): ["""
+# owner.getSingleComponentByType(SVAComponent).S += Vector(1,0,0)
+# """]}))
+# #         # Note that higher Z = closer to camera
 
 
         # Can explicitly call functions on a timer
@@ -248,12 +252,16 @@ owner.getSingleComponentByType(SVAComponent).S += Vector(1,0,0)
         #              100, 150, 0)),
         #     ('c3B', (0, 0, 255, 0, 255, 0, 255, 0, 0, 128, 128, 128))
         # )
-        vertex_list = pyglet.graphics.vertex_list(6,
+        vertex_list = pyglet.graphics.vertex_list(2,
+                ('v3i', (0, 0, 0, 20,100,0)),
+                ('c3B', (255,255,255, 255,0,0))
+        )
+        vertex_list.draw(pyglet.gl.GL_LINES)
+        v2 = pyglet.graphics.vertex_list(6,
                 ('v3i', (0, 0, 0, 100,0,0, 0, 0, 0, 0,100,0, 0,0,0, 0,0,100)),
                 ('c3B', (255,255,255, 255,0,0, 255,255,255, 0,255,0, 255,255,255, 0,0,255))
         )
-        vertex_list.draw(pyglet.gl.GL_LINES)
-
+        v2.draw(pyglet.gl.GL_LINES)
         # Render the current picking frame
         # This frame is rendered in screen-space (0,0)->(game.window.width,game.window.height)
         self.fbo.attach()

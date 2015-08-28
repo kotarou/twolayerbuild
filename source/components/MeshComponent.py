@@ -26,6 +26,7 @@ class MeshComponent(Component):
             self.colored = kwargs['shape'].colored
             self.textured = kwargs['shape'].textured
             self.numVert = len(self.indexList)
+            self.anchor = kwargs['shape'].anchor
 
         vertexByThrees = [self.vertexList[1][i:i+3] for i in range(0, len(self.vertexList[1]), 3)]
         vertexByThrees = [list(e) for e in vertexByThrees]

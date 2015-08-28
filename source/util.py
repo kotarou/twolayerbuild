@@ -7,9 +7,11 @@ import numpy as np
 import math
 from pyglet.gl import *
 
-TOPLEFT = 0
-BOTTOMRIGHT = 1
-CENTER = 2
+TOPLEFT = 1
+TOPRIGHT = 2
+BOTTOMRIGHT = 3
+CENTER = 4
+
 
 class Vector(object):
 
@@ -174,23 +176,34 @@ class Rectangle(Shape):
                  colorList=None, texture=None):
     # NOTE: The anchor also defines the center of rotation.
         self.tl = self.tr = self.br = self.bl = Vector(0,0,0)
+        print("anchor", anchor, TOPLEFT, anchor==TOPLEFT)
         if anchor == TOPLEFT:
             self.tl = position
             self.tr = position + Vector(width,0,0)
             self.bl = position + Vector(0, -height, 0)
             self.br = position + Vector(width, -height, 0)
+            self.anchor = self.tl
+        if anchor == TOPRIGHT:
+            self.tl = position + Vector(-width,0,0)
+            self.tr = position
+            self.bl = position + Vector(-width, -height, 0)
+            self.br = position + Vector(0, -height, 0)
+            self.anchor = self.tr
         elif anchor == BOTTOMRIGHT:
             self.tl = position + Vector(-width, height, 0)
             self.tr = position + Vector(0,height,0)
             self.bl = position + Vector(-width,0, 0)
             self.br = position
+            self.anchor = self.br
         elif anchor == CENTER:
             self.tl = position + Vector(-width/2, height/2, 0)
             self.tr = position + Vector(width/2, height/2, 0)
             self.bl = position + Vector(-width/2, -height/2, 0)
             self.br = position + Vector(width/2, -height/2, 0)
+            self.anchor = (self.tl + self.tr + self.bl + self.br) / 4
         else:
-            raise Exception("Unsupported square anchor")
+            pass
+            #raise Exception("Unsupported square anchor ", anchor)
             #  ('v3f',
 
         [*v] = self.bl.xyz+self.br.xyz+self.tr.xyz+self.bl.xyz+self.tr.xyz+self.tl.xyz
@@ -261,6 +274,11 @@ class Square(Rectangle):
                  colorList=None, texture=None):
                 super().__init__(sideLength, sideLength, position, anchor, colorList, texture)
 
+# class Line(Rectangle):
+#     def __init__(self,
+#                  sideLength=50, position=Vector(0,0,0), anchor=TOPLEFT,
+#                  colorList=None, texture=None):
+#         super().__init__(sideLength, sideLength, position, anchor, colorList, texture)
 
 if __name__ == "__main__":
     a = Square(50, Vector(0, 0, 0), TOPLEFT)
