@@ -92,7 +92,7 @@ class World(object):
         # load the example texture
        
 
-        crown_file = pyglet.image.load('resources/crownrb.png')
+        crown_file = pyglet.image.load('resources/crownrt.png')
         #crown_image = (crown_file.get_region(x=0, y=0, width=30, height=30))
         crown_texture = crown_file.get_texture()
         #crown_texture = crown_texture.get_transform(90)
