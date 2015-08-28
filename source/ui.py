@@ -1,48 +1,57 @@
 from game import world
 from components import *
-
+from entity import *
 class ui:
 
     self.uiActorDict = None
     self.visibleMode = False
+    self.currentlySelectedUIElement = None
 
     def __init__(self):
-        createUIActor(MeshComponent(shape=Square(50, Vector(0,0,0), CENTER, [Color(1,1,1)*4], None)))
-
-        x = Actor(game.world.EntityManager)
-
-        x.addComponent(KeyPressComponent({key(key.ESC, 0): for x in self.uiActorDict: x.setVisible(!self.visibleMode)}))
-        x.addComponent(KeyPressComponent({key(key.ESC, 0): self.visibleMode = !self.visibleMode}))
+        x = Actor(game.world.EntityManager) # the esc to/from menu interaction
+        x.addComponent(KeyPressComponent({key(key.ESC, 0): toggleVisible()}))
         self.uiActorDict.append(x)
 
+        createUIActor(MeshComponent(shape = Rectangle(50, 100, Vector(-100, 0, 0), BOTTOMLEFT, [Color(100, 100 100)*4], None)), "Start Game")
+        createUIActor(MeshComponent(shape = Rectangle(50, 100, Vector(100, 0, 0), BOTTOMLEFT, [Color(100, 100, 100)*4], None)), "Quit Game")
 
-
-
-    def createUIActor(self, meshComponentIn):
+    def createUIActor(self, meshComponentIn, nameIn):
 
         x = Actor(game.world.EntityManager)
 
         x.addComponent(meshComponentIn)
-        x.addComponent(UIComponent)
-        x.addComponent(KeyPressComponent(if(owner.isActive() and owner.isVisible()):({key(key.UP, 0): [owner.getNextUIActor().setActive()]})))) # moves to the above menu element
-        x.addComponent(KeyPressComponent(if(owner.isActive() and owner.isVisible()):({key(key.DOWN, 0): [owner.getPreviousUIActor().setActive()]}))) # moves to the below menu element
-        x.addComponent(KeyPressComponent(if(owner.isActive() and owner.isVisible()):({key(key.ENTER, 0): [owner.activate()]}))) # do stuff to this element (keyboard)
+        x.addComponent(UIComponent(nameIn))
 
-        x.addComponent(MouseClickComponent(if(owner.isActive() and owner.isVisible()): owner.activate())) # do stuff to this element (mouse)
-        x.addComponent(MouseHoverComponent(if(owner.isVisible() and owner.isVisible()): owner.setActive()) # moves to the hovered element
+        x.addComponent(KeyPressComponent(key(key.UP, 0): [self.setActiveUIActor(currentlySelectedUIElement, -1)]) # moves to the above menu element
+        x.addComponent(KeyPressComponent(key(key.DOWN, 0): [self.setActiveUIActor(self.currentlySelectedUIElement, 1)]) # moves to the below menu element
+        x.addComponent(KeyPressComponent(key(key.ENTER, 0): [activate(self.currentlySelectedUIElement)])) # do stuff to this element (keyboard)
+
+        x.addComponent(MouseClickComponent(activate(self.currentlySelectedUIElement))) # do stuff to this element (mouse)
+        x.addComponent(MouseHoverComponent(self.setActiveUIActorByMouse(self.currentlySelectedUIElement, owner)) # moves to the hovered element
 
         self.uiActorDict.append(x)
 
-    def getNextUIActor(self, currentUIActor):
-        temp = self.uiActorDict.getKey(currentUIActor)
-        if(temp + 1 > self.uiActorDict.size()):
-            return self.uiActorDict.get(temp+1)
-        elif:
-            return self.uiActorDict.get(0)
+    def toggleVisible(self):
+        self.visibleMode = !self.visibleMode
+        for x in uiActorDict:
+            x.getSingleComponentsByType(UIComponent).setVisible(self.visibleMode)
 
-    def getPreviousUIActor(selfm currentUIActor):
+    def activate(self, currentUIActor):
+        if(currentUIActor.getSingleComponentsByType(UIComponent).getName() == "Start Game"):
+            game.startGame()
+        elif(currentUIActor.getSingleComponentsByType(UIComponent).getName() == "Quit Game"):
+            game.endGame()
+
+    def setActiveUIActor(self, currentUIActor, offset):
         temp = self.uiActorDict.getKey(currentUIActor)
-        if(temp - 1 > 0):
-            return self.uiActorDict.get(temp-1)
-        elif:
-            return self.uiActorDict.get(self.uiActorDict.size())
+        currentUIActor.getSingleComponentsByType(UIComponent).setActive(False)
+        if((temp + offset) > self.uiActorDict.size()):
+            self.uiActorDict.get(0).getSingleComponentsByType(UIComponent).setActive(True)
+        elif(0 > (temp + offset)):
+            self.uiActorDict.get(self.uiActorDict.size()).getSingleComponentsByType(UIComponent).setActive(True)
+        elif(True):
+            self.uiActorDict.get(temp + offset).getSingleComponentsByType(UIComponent).setActive(True)
+
+    def setActiveUIActorByMouse(self, currentUIActor, newUIACtor):
+        currentUIActor.getSingleComponentsByType(UIComponent).setActive(False)
+        newUIACtor.getSingleComponentsByType(UIComponent).setActive(True)
